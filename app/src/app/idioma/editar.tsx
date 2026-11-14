@@ -48,13 +48,17 @@ function Formulario({ existente }: { existente?: Idioma }) {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      contentContainerStyle={styles.conteudo}
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets
+    >
       <Stack.Screen options={{ title: existente ? 'Editar idioma' : 'Novo idioma' }} />
 
       {!existente && (
         <>
           <Text style={styles.rotulo}>Sugestões</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 8 }}>
             {SUGESTOES.map((s) => (
               <Chip
                 key={s.codigo}

@@ -43,7 +43,11 @@ function Formulario({ idiomas, existente }: { idiomas: Idioma[]; existente?: Bar
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      contentContainerStyle={styles.conteudo}
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets
+    >
       <Stack.Screen options={{ title: existente ? 'Editar baralho' : 'Novo baralho' }} />
 
       <TextInput mode="outlined" label="Título" value={titulo} onChangeText={setTitulo} maxLength={80} />

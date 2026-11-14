@@ -53,7 +53,11 @@ function Formulario({ existente, baralhoId }: { existente?: Cartao; baralhoId: n
   const valido = frente.trim().length > 0 && verso.trim().length > 0 && !salvar.isPending;
 
   return (
-    <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      contentContainerStyle={styles.conteudo}
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets
+    >
       <Stack.Screen options={{ title: existente ? 'Editar cartão' : 'Novo cartão' }} />
       <Text style={styles.dica}>A frente é o que você vai tentar lembrar; o verso, a resposta.</Text>
       <TextInput mode="outlined" label="Frente (ex.: die Katze)" value={frente} onChangeText={setFrente} maxLength={200} />

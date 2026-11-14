@@ -24,7 +24,7 @@ export default function Baralhos() {
         <Titulo titulo="Baralhos" subtitulo="Seus conjuntos de cartões" />
 
         {(idiomas.data?.length ?? 0) > 1 && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filtros}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={styles.filtros}>
             <Chip selected={!idiomaId} showSelectedCheck={false} onPress={() => setIdiomaId(undefined)}>
               Todos
             </Chip>

@@ -21,6 +21,7 @@ export function Tela({ children, semCabecalho, atualizando = false, aoAtualizar 
         { paddingTop: semCabecalho ? insets.top + 12 : 16, paddingBottom: insets.bottom + 110 },
       ]}
       keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets
       refreshControl={
         aoAtualizar ? <RefreshControl refreshing={atualizando} onRefresh={aoAtualizar} tintColor={cores.primaria} /> : undefined
       }
