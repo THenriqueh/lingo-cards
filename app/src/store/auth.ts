@@ -1,14 +1,9 @@
-import * as SecureStore from 'expo-secure-store';
 import { create } from 'zustand';
-import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import type { Usuario } from '@/api/tipos';
+import { armazenamentoSeguro } from './armazenamento';
 
-// Guarda a sessão no armazenamento seguro do aparelho (Keychain no iOS, Keystore no Android).
-const armazenamentoSeguro: StateStorage = {
-  getItem: (chave) => SecureStore.getItemAsync(chave),
-  setItem: (chave, valor) => SecureStore.setItemAsync(chave, valor),
-  removeItem: (chave) => SecureStore.deleteItemAsync(chave),
-};
+// A sessão fica no armazenamento seguro do aparelho.
 
 type AuthState = {
   token: string | null;

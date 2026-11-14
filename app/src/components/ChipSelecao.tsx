@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet } from 'react-native';
 import { Chip } from 'react-native-paper';
+import { feedback } from '@/lib/feedback';
 import { cores } from '@/theme';
 
 type Props = {
@@ -16,7 +17,10 @@ export function ChipSelecao({ selecionado, aoPressionar, children }: Props) {
       mode={selecionado ? 'flat' : 'outlined'}
       selected={selecionado}
       showSelectedCheck={false}
-      onPress={aoPressionar}
+      onPress={() => {
+        feedback.selecao();
+        aoPressionar();
+      }}
       style={[styles.chip, selecionado && styles.selecionado]}
       textStyle={[styles.texto, selecionado && styles.textoSelecionado]}
     >

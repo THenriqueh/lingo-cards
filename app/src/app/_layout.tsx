@@ -1,10 +1,12 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { DarkTheme, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { View } from 'react-native';
 import { ActivityIndicator, PaperProvider } from 'react-native-paper';
 import { queryClient } from '@/api/client';
 import { Aviso } from '@/components/Aviso';
+import { prepararSons } from '@/lib/feedback';
 import { useAuth } from '@/store/auth';
 import { cores, tema } from '@/theme';
 
@@ -16,6 +18,10 @@ const temaNavegacao = {
 export default function RootLayout() {
   const hidratado = useAuth((s) => s.hidratado);
   const logado = useAuth((s) => !!s.token);
+
+  useEffect(() => {
+    prepararSons();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
