@@ -36,7 +36,9 @@ function contarParaRevisar(cartoes: { proximaRevisao: Date }[], agora = new Date
 
 function resumir<T extends { cartoes: { id: number; proximaRevisao: Date }[] }>(b: T) {
   const { cartoes, ...resto } = b;
-  return { ...resto, totalCartoes: cartoes.length, paraRevisar: contarParaRevisar(cartoes) };
+  // Quando vence a próxima revisão do baralho (o cartão mais próximo).
+  const proximaRevisao = cartoes.reduce<Date | null>((min, c) => (!min || c.proximaRevisao < min ? c.proximaRevisao : min), null);
+  return { ...resto, totalCartoes: cartoes.length, paraRevisar: contarParaRevisar(cartoes), proximaRevisao };
 }
 
 baralhosRoutes.get('/', async (req, res) => {

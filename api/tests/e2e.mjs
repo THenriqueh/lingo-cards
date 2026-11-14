@@ -89,6 +89,8 @@ ok(r.j.intervaloDias > 6 && r.j.facilidade > 2.5, `fácil: intervalo cresce (${r
 r = await req('POST', `/cartoes/${car2}/revisao`, { nota: 'errei' }, T);
 ok(r.j.repeticoes === 0 && diasAte(r.j.proximaRevisao) === 1 && r.j.facilidade < 2.6, 'errou: recomeça e volta amanhã');
 ok((await req('GET', `/baralhos/${bar}`, null, T)).j.paraRevisar === 0, 'revisado sai da fila do baralho');
+r = await req('GET', '/baralhos', null, T);
+ok(diasAte(r.j[0].proximaRevisao) === 1, 'lista de baralhos informa a próxima revisão');
 r = await req('GET', '/estatisticas', null, T);
 ok(r.j.revisoesPendentes === 0 && r.j.cartoesDominados === 0, 'estatísticas trazem revisões pendentes e dominados');
 
