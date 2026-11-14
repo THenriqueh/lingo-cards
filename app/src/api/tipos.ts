@@ -1,0 +1,57 @@
+export type Usuario = { id: number; nome: string; email: string; criadoEm: string };
+
+export type Idioma = {
+  id: number;
+  nome: string;
+  codigo: string;
+  bandeira: string;
+  criadoEm: string;
+  totalBaralhos?: number;
+};
+
+export type Cartao = {
+  id: number;
+  baralhoId: number;
+  frente: string;
+  verso: string;
+  exemplo: string | null;
+  criadoEm: string;
+};
+
+export type Baralho = {
+  id: number;
+  idiomaId: number;
+  titulo: string;
+  descricao: string;
+  nivel: string;
+  criadoEm: string;
+  atualizadoEm: string;
+  idioma?: Idioma;
+  totalCartoes?: number;
+  cartoes?: Cartao[];
+};
+
+export type Sessao = {
+  id: number;
+  baralhoId: number;
+  acertos: number;
+  erros: number;
+  duracaoSegundos: number;
+  realizadaEm: string;
+  baralho?: { id: number; titulo: string };
+};
+
+export type Estatisticas = {
+  totalIdiomas: number;
+  totalBaralhos: number;
+  totalCartoes: number;
+  totalSessoes: number;
+  diasEstudados: number;
+  minutosEstudados: number;
+  taxaAcerto: number | null;
+};
+
+export type IdiomaInput = Pick<Idioma, 'nome' | 'codigo' | 'bandeira'>;
+export type BaralhoInput = Pick<Baralho, 'idiomaId' | 'titulo' | 'descricao' | 'nivel'>;
+export type CartaoInput = Pick<Cartao, 'baralhoId' | 'frente' | 'verso' | 'exemplo'>;
+export type SessaoInput = Pick<Sessao, 'baralhoId' | 'acertos' | 'erros' | 'duracaoSegundos'>;
