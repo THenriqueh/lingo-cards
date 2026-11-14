@@ -1,3 +1,8 @@
-// Endereço da API Lingo Cards (back-end Express publicado no Render).
-// Para testar com a API rodando no seu Mac, use o IP da rede local, ex.: 'http://192.168.1.109:3333'.
-export const API_URL = 'https://COLE-AQUI-A-URL-DO-RENDER.onrender.com';
+// API publicada (Render). É a usada no app publicado no Expo.
+const URL_PRODUCAO = 'https://COLE-AQUI-A-URL-DO-RENDER.onrender.com';
+
+// Em desenvolvimento, dá para apontar para a API rodando no seu computador
+// criando o arquivo app/.env.local (ignorado pelo Git) com:
+//   EXPO_PUBLIC_API_URL=http://<IP-do-seu-Mac-na-rede>:3333
+// No app publicado (__DEV__ = false), sempre vale a URL de produção.
+export const API_URL = (__DEV__ && process.env.EXPO_PUBLIC_API_URL) || URL_PRODUCAO;
