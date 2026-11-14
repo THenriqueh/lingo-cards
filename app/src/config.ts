@@ -1,5 +1,5 @@
 // API publicada (Render). É a usada no app publicado no Expo.
-const URL_PRODUCAO = 'https://COLE-AQUI-A-URL-DO-RENDER.onrender.com';
+const URL_PRODUCAO = 'https://lingo-cards.onrender.com';
 
 // Em desenvolvimento, dá para apontar para a API rodando no seu computador
 // criando o arquivo app/.env.local (ignorado pelo Git) com:
