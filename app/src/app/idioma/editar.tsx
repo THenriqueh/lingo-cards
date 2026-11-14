@@ -1,10 +1,11 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { Button, Chip, HelperText, Text, TextInput } from 'react-native-paper';
+import { Button, HelperText, Text, TextInput } from 'react-native-paper';
 import { mensagemDeErro } from '@/api/client';
 import { useIdiomas, useSalvarIdioma } from '@/api/hooks';
 import type { Idioma } from '@/api/tipos';
+import { ChipSelecao } from '@/components/ChipSelecao';
 import { useAviso } from '@/components/Aviso';
 import { Carregando } from '@/components/Estados';
 import { cores } from '@/theme';
@@ -60,18 +61,17 @@ function Formulario({ existente }: { existente?: Idioma }) {
           <Text style={styles.rotulo}>Sugestões</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 8 }}>
             {SUGESTOES.map((s) => (
-              <Chip
+              <ChipSelecao
                 key={s.codigo}
-                selected={codigo === s.codigo}
-                showSelectedCheck={false}
-                onPress={() => {
+                selecionado={codigo === s.codigo}
+                aoPressionar={() => {
                   setNome(s.nome);
                   setCodigo(s.codigo);
                   setBandeira(s.bandeira);
                 }}
               >
                 {s.bandeira} {s.nome}
-              </Chip>
+              </ChipSelecao>
             ))}
           </ScrollView>
         </>

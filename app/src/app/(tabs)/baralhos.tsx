@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Card, Chip, FAB, Text } from 'react-native-paper';
 import { useBaralhos, useIdiomas } from '@/api/hooks';
+import { ChipSelecao } from '@/components/ChipSelecao';
 import { Carregando, Erro, Vazio } from '@/components/Estados';
 import { Tela } from '@/components/Tela';
 import { Titulo } from '@/components/Titulo';
@@ -25,18 +26,17 @@ export default function Baralhos() {
 
         {(idiomas.data?.length ?? 0) > 1 && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={styles.filtros}>
-            <Chip selected={!idiomaId} showSelectedCheck={false} onPress={() => setIdiomaId(undefined)}>
+            <ChipSelecao selecionado={!idiomaId} aoPressionar={() => setIdiomaId(undefined)}>
               Todos
-            </Chip>
+            </ChipSelecao>
             {idiomas.data!.map((i) => (
-              <Chip
+              <ChipSelecao
                 key={i.id}
-                selected={idiomaId === i.id}
-                showSelectedCheck={false}
-                onPress={() => setIdiomaId(idiomaId === i.id ? undefined : i.id)}
+                selecionado={idiomaId === i.id}
+                aoPressionar={() => setIdiomaId(idiomaId === i.id ? undefined : i.id)}
               >
                 {i.bandeira} {i.nome}
-              </Chip>
+              </ChipSelecao>
             ))}
           </ScrollView>
         )}

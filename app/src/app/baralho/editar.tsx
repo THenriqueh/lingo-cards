@@ -1,10 +1,11 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Chip, HelperText, Text, TextInput } from 'react-native-paper';
+import { Button, HelperText, Text, TextInput } from 'react-native-paper';
 import { mensagemDeErro } from '@/api/client';
 import { useBaralho, useIdiomas, useSalvarBaralho } from '@/api/hooks';
 import type { Baralho, Idioma } from '@/api/tipos';
+import { ChipSelecao } from '@/components/ChipSelecao';
 import { useAviso } from '@/components/Aviso';
 import { Carregando, Erro } from '@/components/Estados';
 import { cores, NIVEIS } from '@/theme';
@@ -63,18 +64,18 @@ function Formulario({ idiomas, existente }: { idiomas: Idioma[]; existente?: Bar
       <Text style={styles.rotulo}>Idioma</Text>
       <View style={styles.chips}>
         {idiomas.map((i) => (
-          <Chip key={i.id} selected={idiomaId === i.id} onPress={() => setIdiomaId(i.id)}>
+          <ChipSelecao key={i.id} selecionado={idiomaId === i.id} aoPressionar={() => setIdiomaId(i.id)}>
             {i.bandeira} {i.nome}
-          </Chip>
+          </ChipSelecao>
         ))}
       </View>
 
       <Text style={styles.rotulo}>Nível (Quadro Europeu)</Text>
       <View style={styles.chips}>
         {NIVEIS.map((n) => (
-          <Chip key={n} selected={nivel === n} showSelectedCheck={false} onPress={() => setNivel(n)} style={styles.nivel}>
+          <ChipSelecao key={n} selecionado={nivel === n} aoPressionar={() => setNivel(n)}>
             {n}
-          </Chip>
+          </ChipSelecao>
         ))}
       </View>
 
@@ -99,5 +100,4 @@ const styles = StyleSheet.create({
   conteudo: { padding: 20, gap: 10, backgroundColor: cores.fundo, flexGrow: 1 },
   rotulo: { color: cores.textoSuave, fontSize: 13, marginTop: 6 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  nivel: { minWidth: 52 },
 });
