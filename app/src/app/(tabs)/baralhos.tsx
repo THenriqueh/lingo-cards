@@ -73,6 +73,7 @@ export default function Baralhos() {
                     {b.nivel}
                   </Chip>
                   <Text style={styles.total}>{plural(b.totalCartoes ?? 0, 'cartão', 'cartões')}</Text>
+                  {(b.paraRevisar ?? 0) > 0 ? <Text style={styles.revisar}>{b.paraRevisar} p/ revisar</Text> : null}
                 </View>
               </Card.Content>
             </Card>
@@ -92,5 +93,6 @@ const styles = StyleSheet.create({
   bandeira: { fontSize: 32 },
   nivel: { fontSize: 12, fontWeight: '700' },
   total: { color: cores.textoSuave, fontSize: 12 },
+  revisar: { color: cores.primaria, fontSize: 12, fontWeight: '700' },
   fab: { position: 'absolute', right: 16, bottom: 110, ...brilho(cores.primaria) },
 });

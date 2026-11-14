@@ -1,7 +1,7 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Card, Chip, FAB, IconButton, Menu, Text } from 'react-native-paper';
+import { Button, Card, Chip, FAB, IconButton, Menu, SegmentedButtons, Text } from 'react-native-paper';
 import { mensagemDeErro } from '@/api/client';
 import { useBaralho, useExcluirBaralho, useExcluirCartao } from '@/api/hooks';
 import type { Cartao } from '@/api/tipos';
@@ -10,7 +10,9 @@ import { Confirmacao } from '@/components/Confirmacao';
 import { Entrada } from '@/components/Entrada';
 import { Carregando, Erro, Vazio } from '@/components/Estados';
 import { Tela } from '@/components/Tela';
-import { plural } from '@/lib/formato';
+import { pendentes, plural, quandoRevisar } from '@/lib/formato';
+import { pronunciar } from '@/lib/pronuncia';
+import { usePreferencias, type ModoResposta } from '@/store/preferencias';
 import { brilho, cartaoProfundo, cores } from '@/theme';
 
 export default function DetalheBaralho() {
@@ -23,11 +25,15 @@ export default function DetalheBaralho() {
   const [menu, setMenu] = useState(false);
   const [confirmarBaralho, setConfirmarBaralho] = useState(false);
   const [cartaoAExcluir, setCartaoAExcluir] = useState<Cartao | null>(null);
+  const { modoResposta, definirModoResposta } = usePreferencias();
 
   if (baralho.isPending) return <Carregando />;
   if (baralho.isError) return <Erro erro={baralho.error} aoTentarDeNovo={baralho.refetch} />;
   const b = baralho.data;
   const cartoes = b.cartoes ?? [];
+  const paraRevisar = pendentes(cartoes).length;
+  const estudar = (modo: 'revisao' | 'todos') =>
+    router.push({ pathname: '/estudar/[id]', params: { id: b.id, modo } });
 
   async function handleExcluirBaralho() {
     try {
@@ -97,15 +103,38 @@ export default function DetalheBaralho() {
           {b.descricao ? <Text style={styles.descricao}>{b.descricao}</Text> : null}
         </View>
 
-        <Button
-          mode="contained"
-          icon="play"
-          disabled={cartoes.length === 0}
-          contentStyle={{ paddingVertical: 8 }}
-          onPress={() => router.push({ pathname: '/estudar/[id]', params: { id: b.id } })}
-        >
-          {cartoes.length === 0 ? 'Adicione cartões para estudar' : 'Estudar agora'}
-        </Button>
+        {cartoes.length === 0 ? (
+          <Button mode="contained" icon="play" disabled contentStyle={{ paddingVertical: 8 }}>
+            Adicione cartões para estudar
+          </Button>
+        ) : (
+          <View style={{ gap: 10 }}>
+            {/* Repetição espaçada: primeiro o que está para vencer. */}
+            {paraRevisar > 0 ? (
+              <Button mode="contained" icon="calendar-refresh" contentStyle={{ paddingVertical: 8 }} style={brilho(cores.primaria)} onPress={() => estudar('revisao')}>
+                Revisar {plural(paraRevisar, 'cartão', 'cartões')} de hoje
+              </Button>
+            ) : (
+              <Card mode="contained" style={[cartaoProfundo, { backgroundColor: `${cores.acerto}18` }]}>
+                <Card.Content style={styles.emDia}>
+                  <Text style={{ fontSize: 22 }}>✅</Text>
+                  <Text style={{ color: cores.texto, flex: 1 }}>Revisões em dia! Os cartões voltam quando estiverem perto de ser esquecidos.</Text>
+                </Card.Content>
+              </Card>
+            )}
+            <Button mode={paraRevisar > 0 ? 'outlined' : 'contained'} icon="cards-playing-outline" contentStyle={{ paddingVertical: 6 }} onPress={() => estudar('todos')}>
+              Estudar todos os cartões
+            </Button>
+            <SegmentedButtons
+              value={modoResposta}
+              onValueChange={(v) => definirModoResposta(v as ModoResposta)}
+              buttons={[
+                { value: 'virar', label: 'Virar carta', icon: 'rotate-3d-variant' },
+                { value: 'digitar', label: 'Digitar resposta', icon: 'keyboard-outline' },
+              ]}
+            />
+          </View>
+        )}
 
         <Text variant="titleMedium" style={styles.secao}>
           Cartões
@@ -127,7 +156,9 @@ export default function DetalheBaralho() {
                   </Text>
                   <Text style={{ color: cores.secundaria }}>{c.verso}</Text>
                   {c.exemplo ? <Text style={styles.exemplo}>“{c.exemplo}”</Text> : null}
+                  <Text style={styles.revisao}>{quandoRevisar(c.proximaRevisao)}</Text>
                 </View>
+                <IconButton icon="volume-high" size={20} iconColor={cores.secundaria} onPress={() => pronunciar(c.frente, b.idioma?.codigo)} />
                 <IconButton icon="pencil-outline" size={20} onPress={() => router.push({ pathname: '/cartao/editar', params: { id: c.id } })} />
                 <IconButton icon="trash-can-outline" size={20} iconColor={cores.erro} onPress={() => setCartaoAExcluir(c)} />
               </Card.Content>
@@ -166,5 +197,7 @@ const styles = StyleSheet.create({
   secao: { color: cores.texto, fontWeight: '700', marginTop: 6 },
   cartao: { flexDirection: 'row', alignItems: 'center', paddingRight: 0 },
   exemplo: { color: cores.textoSuave, fontStyle: 'italic', fontSize: 13, marginTop: 2 },
+  revisao: { color: cores.textoSuave, fontSize: 11, marginTop: 4, textTransform: 'uppercase', letterSpacing: 0.5 },
+  emDia: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   fab: { position: 'absolute', right: 16, bottom: 40, ...brilho(cores.primaria) },
 });

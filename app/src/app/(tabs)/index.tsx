@@ -46,7 +46,12 @@ export default function Inicio() {
 
   const recarregar = () => Promise.all([estatisticas.refetch(), baralhos.refetch()]);
   const e = estatisticas.data;
-  const recentes = (baralhos.data ?? []).filter((b) => (b.totalCartoes ?? 0) > 0).slice(0, 3);
+  // Primeiro os baralhos com revisões vencidas (repetição espaçada).
+  const recentes = (baralhos.data ?? [])
+    .filter((b) => (b.totalCartoes ?? 0) > 0)
+    .sort((a, b) => (b.paraRevisar ?? 0) - (a.paraRevisar ?? 0))
+    .slice(0, 3);
+  const pendentesHoje = e?.revisoesPendentes ?? 0;
   const primeiroNome = usuario?.nome.split(' ')[0] ?? '';
 
   return (
@@ -76,16 +81,26 @@ export default function Inicio() {
               <ProgressBar progress={(e?.taxaAcerto ?? 0) / 100} color="#FFFFFF" style={styles.barra} />
               <Text style={styles.destaqueTexto}>
                 {e && e.totalSessoes > 0
-                  ? `Em ${plural(e.totalSessoes, 'sessão', 'sessões')} de estudo`
+                  ? `Em ${plural(e.totalSessoes, 'sessão', 'sessões')} · ${e.minutosEstudados} min de estudo`
                   : 'Faça sua primeira sessão de estudo para ver seu desempenho.'}
               </Text>
+              {e && e.totalCartoes > 0 ? (
+                <View style={styles.revisoes}>
+                  <Icon source={pendentesHoje > 0 ? 'calendar-refresh' : 'check-circle'} size={18} color="#FFFFFF" />
+                  <Text style={styles.revisoesTexto}>
+                    {pendentesHoje > 0
+                      ? `${plural(pendentesHoje, 'cartão', 'cartões')} para revisar hoje`
+                      : 'Revisões em dia!'}
+                  </Text>
+                </View>
+              ) : null}
             </LinearGradient>
           </Entrada>
 
           <Entrada indice={2} style={styles.grade}>
             <Metrica icone="cards-outline" valor={String(e?.totalCartoes ?? '–')} rotulo="cartões" cor={cores.primaria} />
             <Metrica icone="calendar-check" valor={String(e?.diasEstudados ?? '–')} rotulo="dias de estudo" cor={cores.acerto} />
-            <Metrica icone="timer-outline" valor={String(e?.minutosEstudados ?? '–')} rotulo="minutos" cor={cores.destaque} />
+            <Metrica icone="star-circle-outline" valor={String(e?.cartoesDominados ?? '–')} rotulo="dominados" cor={cores.destaque} />
           </Entrada>
         </>
       )}
@@ -116,18 +131,27 @@ export default function Inicio() {
                 <Card.Title
                   title={b.titulo}
                   titleStyle={{ fontWeight: '700' }}
-                  subtitle={`${b.idioma?.bandeira ?? ''} ${b.idioma?.nome ?? ''} · ${plural(b.totalCartoes ?? 0, 'cartão', 'cartões')}`}
-                  right={() => (
-                    <Button
-                      mode="contained"
-                      compact
-                      icon="play"
-                      style={{ marginRight: 12 }}
-                      onPress={() => router.push({ pathname: '/estudar/[id]', params: { id: b.id } })}
-                    >
-                      Estudar
-                    </Button>
-                  )}
+                  subtitle={
+                    (b.paraRevisar ?? 0) > 0
+                      ? `${b.idioma?.bandeira ?? ''} ${plural(b.paraRevisar ?? 0, 'cartão', 'cartões')} para revisar`
+                      : `${b.idioma?.bandeira ?? ''} ${b.idioma?.nome ?? ''} · em dia`
+                  }
+                  right={() => {
+                    const revisar = (b.paraRevisar ?? 0) > 0;
+                    return (
+                      <Button
+                        mode={revisar ? 'contained' : 'contained-tonal'}
+                        compact
+                        icon={revisar ? 'calendar-refresh' : 'play'}
+                        style={{ marginRight: 12 }}
+                        onPress={() =>
+                          router.push({ pathname: '/estudar/[id]', params: { id: b.id, modo: revisar ? 'revisao' : 'todos' } })
+                        }
+                      >
+                        {revisar ? 'Revisar' : 'Estudar'}
+                      </Button>
+                    );
+                  }}
                 />
               </Card>
             </Toque>
@@ -148,6 +172,17 @@ const styles = StyleSheet.create({
   destaqueValor: { color: '#FFFFFF', fontWeight: '800' },
   destaqueTexto: { color: 'rgba(255,255,255,0.85)' },
   barra: { height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.25)' },
+  revisoes: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(20,16,46,0.28)',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+  },
+  revisoesTexto: { color: '#FFFFFF', fontWeight: '700' },
   grade: { flexDirection: 'row', gap: 10 },
   metrica: { flex: 1 },
   metricaIcone: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },

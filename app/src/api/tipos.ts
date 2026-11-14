@@ -15,8 +15,16 @@ export type Cartao = {
   frente: string;
   verso: string;
   exemplo: string | null;
+  // Repetição espaçada (calculada pela API)
+  facilidade: number;
+  intervaloDias: number;
+  repeticoes: number;
+  proximaRevisao: string;
   criadoEm: string;
 };
+
+/** Como o usuário se saiu num cartão; a API usa isso para agendar a próxima revisão. */
+export type NotaRevisao = 'errei' | 'dificil' | 'acertei' | 'facil';
 
 export type Baralho = {
   id: number;
@@ -28,6 +36,7 @@ export type Baralho = {
   atualizadoEm: string;
   idioma?: Idioma;
   totalCartoes?: number;
+  paraRevisar?: number;
   cartoes?: Cartao[];
 };
 
@@ -46,6 +55,8 @@ export type Estatisticas = {
   totalBaralhos: number;
   totalCartoes: number;
   totalSessoes: number;
+  revisoesPendentes: number;
+  cartoesDominados: number;
   diasEstudados: number;
   minutosEstudados: number;
   taxaAcerto: number | null;

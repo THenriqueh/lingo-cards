@@ -26,7 +26,7 @@ export function Erro({ erro, aoTentarDeNovo }: { erro: unknown; aoTentarDeNovo: 
   );
 }
 
-type VazioProps = { humor?: Humor; titulo: string; texto: string; acao?: { rotulo: string; aoPressionar: () => void } };
+type VazioProps = { humor?: Humor; titulo: string; texto: string; acao?: { rotulo: string; aoPressionar: () => void; icone?: string } };
 
 export function Vazio({ humor = 'pensando', titulo, texto, acao }: VazioProps) {
   return (
@@ -35,7 +35,7 @@ export function Vazio({ humor = 'pensando', titulo, texto, acao }: VazioProps) {
       <Text variant="titleMedium">{titulo}</Text>
       <Text style={styles.texto}>{texto}</Text>
       {acao ? (
-        <Button mode="contained" icon="plus" onPress={acao.aoPressionar}>
+        <Button mode="contained" icon={acao.icone ?? 'plus'} onPress={acao.aoPressionar}>
           {acao.rotulo}
         </Button>
       ) : null}

@@ -8,6 +8,7 @@ import type {
   Estatisticas,
   Idioma,
   IdiomaInput,
+  NotaRevisao,
   Sessao,
   SessaoInput,
   Usuario,
@@ -118,6 +119,17 @@ export function useExcluirCartao() {
   });
 }
 
+/**
+ * Registra a resposta de um cartão (repetição espaçada).
+ * Não invalida nada no meio da sessão; a lista é atualizada quando a sessão é salva.
+ */
+export function useRevisarCartao() {
+  return useMutation({
+    mutationFn: ({ id, nota }: { id: number; nota: NotaRevisao }) =>
+      api.post<Cartao>(`/cartoes/${id}/revisao`, { nota }).then((r) => r.data),
+  });
+}
+
 // ---------- Sessões de estudo ----------
 export const useSessoes = () =>
   useQuery({ queryKey: chaves.sessoes, queryFn: () => api.get<Sessao[]>('/sessoes').then((r) => r.data) });
@@ -137,7 +149,7 @@ export function useSalvarSessao() {
         ? api.put<Sessao>(`/sessoes/${id}`, dados)
         : api.post<Sessao>('/sessoes', { baralhoId, ...dados })
       ).then((r) => r.data),
-    onSuccess: () => invalidar('sessoes', 'sessao', 'estatisticas'),
+    onSuccess: () => invalidar('sessoes', 'sessao', 'estatisticas', 'baralho', 'baralhos'),
   });
 }
 
