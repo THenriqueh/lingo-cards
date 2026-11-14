@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { cores, degrades } from '@/theme';
+import { cores } from '@/theme';
 
 type Props = {
   children: ReactNode;
@@ -16,8 +15,6 @@ export function Tela({ children, semCabecalho, atualizando = false, aoAtualizar 
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.tela}>
-      {/* Brilho suave no topo, que dá profundidade ao fundo. */}
-      <LinearGradient colors={degrades.brilhoFundo} style={styles.brilho} />
       <ScrollView
         style={styles.rolagem}
         contentContainerStyle={[
@@ -39,6 +36,5 @@ export function Tela({ children, semCabecalho, atualizando = false, aoAtualizar 
 const styles = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cores.fundo },
   rolagem: { flex: 1 },
-  brilho: { position: 'absolute', top: 0, left: 0, right: 0, height: 340, pointerEvents: 'none' },
   conteudo: { paddingHorizontal: 16, gap: 14 },
 });

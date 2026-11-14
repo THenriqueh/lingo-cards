@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { StyleSheet } from 'react-native';
 import { Chip } from 'react-native-paper';
 import { feedback } from '@/lib/feedback';
-import { cores } from '@/theme';
+import { cores, fontes } from '@/theme';
 
 type Props = {
   selecionado: boolean;
@@ -33,5 +33,5 @@ const styles = StyleSheet.create({
   chip: { borderColor: cores.borda, backgroundColor: 'transparent' },
   selecionado: { backgroundColor: cores.primaria, borderColor: cores.primaria },
   texto: { color: cores.textoSuave },
-  textoSelecionado: { color: '#14102E', fontWeight: '700' },
+  textoSelecionado: { color: cores.sobreCor, fontFamily: fontes.negrito },
 });
