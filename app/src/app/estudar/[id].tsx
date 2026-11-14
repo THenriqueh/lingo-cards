@@ -3,7 +3,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Button, Icon, ProgressBar, Text } from 'react-native-paper';
-import Animated, { FadeIn, interpolate, useAnimatedStyle, useSharedValue, withTiming, ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn, interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { mensagemDeErro } from '@/api/client';
 import { useBaralho, useSalvarSessao } from '@/api/hooks';
 import type { Baralho, Cartao } from '@/api/tipos';
@@ -23,6 +23,18 @@ function embaralhar<T>(lista: T[]) {
     [copia[i], copia[j]] = [copia[j], copia[i]];
   }
   return copia;
+}
+
+// Cada carta nova surge com um leve fade e quase nenhum zoom.
+function entradaCarta() {
+  'worklet';
+  return {
+    initialValues: { opacity: 0, transform: [{ scale: 0.97 }] },
+    animations: {
+      opacity: withTiming(1, { duration: 200 }),
+      transform: [{ scale: withTiming(1, { duration: 200 }) }],
+    },
+  };
 }
 
 const sortear = (frases: string[]) => frases[Math.floor(Math.random() * frases.length)];
@@ -153,7 +165,7 @@ function Sessao({ baralho }: { baralho: Baralho }) {
       </View>
       <ProgressBar progress={indice / ordem.length} style={styles.barra} />
 
-      <Animated.View key={`${rodada}-${cartao.id}`} entering={ZoomIn.springify().damping(15)} style={styles.area}>
+      <Animated.View key={`${rodada}-${cartao.id}`} entering={entradaCarta} style={styles.area}>
         <Pressable style={{ flex: 1 }} onPress={virar}>
           <Animated.View style={[styles.carta, frenteEstilo]}>
             <LinearGradient colors={degrades.carta} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.preenchimento, styles.frente]}>

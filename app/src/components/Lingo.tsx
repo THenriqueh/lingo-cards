@@ -4,7 +4,6 @@ import Animated, {
   useSharedValue,
   withRepeat,
   withSequence,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
@@ -37,13 +36,12 @@ export function Lingo({ humor = 'feliz', tamanho = 120 }: Props) {
   useEffect(() => {
     if (humor === 'triste') {
       giro.value = withSequence(
-        withTiming(-6, { duration: 70 }),
-        withTiming(6, { duration: 70 }),
-        withTiming(-4, { duration: 70 }),
+        withTiming(-3, { duration: 80 }),
+        withTiming(3, { duration: 80 }),
         withTiming(0, { duration: 70 }),
       );
     } else {
-      escala.value = withSequence(withTiming(1.12, { duration: 110 }), withSpring(1, { damping: 8, stiffness: 220 }));
+      escala.value = withSequence(withTiming(1.05, { duration: 120 }), withTiming(1, { duration: 160 }));
     }
   }, [humor, escala, giro]);
 
@@ -62,7 +60,7 @@ export function Lingo({ humor = 'feliz', tamanho = 120 }: Props) {
 
   const estilo = useAnimatedStyle(() => ({
     transform: [
-      { translateY: -5 * flutuar.value },
+      { translateY: -3 * flutuar.value },
       { scale: escala.value },
       { rotate: `${giro.value}deg` },
     ],

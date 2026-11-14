@@ -74,7 +74,7 @@ export default function Conta() {
       <Card mode="contained" style={cartaoProfundo}>
         <List.Item
           title="Sons"
-          description="Efeitos ao acertar, errar e virar cartões"
+          description="Efeitos sonoros durante o estudo"
           left={(p) => <List.Icon {...p} icon={sons ? 'volume-high' : 'volume-off'} />}
           right={() => (
             <Switch

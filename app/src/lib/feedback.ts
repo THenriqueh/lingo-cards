@@ -1,31 +1,34 @@
-import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-audio';
+import type { AudioPlayer } from 'expo-audio';
 import * as Haptics from 'expo-haptics';
 import { usePreferencias } from '@/store/preferencias';
 
 // Efeitos sonoros curtos, sintetizados para o app (sem áudio de terceiros).
+// Só os momentos do estudo têm som; o resto da navegação usa apenas vibração.
 const arquivos = {
-  toque: require('../../assets/sons/toque.wav'),
   virar: require('../../assets/sons/virar.wav'),
   acerto: require('../../assets/sons/acerto.wav'),
   erro: require('../../assets/sons/erro.wav'),
   conclusao: require('../../assets/sons/conclusao.wav'),
-  sucesso: require('../../assets/sons/sucesso.wav'),
-  excluir: require('../../assets/sons/excluir.wav'),
 };
 type Som = keyof typeof arquivos;
 
 const players: Partial<Record<Som, AudioPlayer>> = {};
 
-/** Carrega os sons uma vez, no início do app, para tocarem sem atraso. */
+/**
+ * Carrega os sons uma vez, depois que o app abriu, para tocarem sem atraso.
+ * O módulo de áudio é carregado sob demanda: se ele não estiver disponível no aparelho,
+ * o app continua funcionando, só que sem som.
+ */
 export function prepararSons() {
-  // Respeita a chave de silencioso do iPhone e não interrompe a música de outros apps.
-  setAudioModeAsync({ playsInSilentMode: false, interruptionMode: 'mixWithOthers' }).catch(() => {});
-  for (const som of Object.keys(arquivos) as Som[]) {
-    try {
+  try {
+    const { createAudioPlayer, setAudioModeAsync } = require('expo-audio') as typeof import('expo-audio');
+    // Respeita a chave de silencioso do iPhone e não interrompe a música de outros apps.
+    setAudioModeAsync({ playsInSilentMode: false, interruptionMode: 'mixWithOthers' }).catch(() => {});
+    for (const som of Object.keys(arquivos) as Som[]) {
       players[som] ??= createAudioPlayer(arquivos[som]);
-    } catch {
-      // Sem som não é motivo para quebrar o app.
     }
+  } catch (erro) {
+    console.warn('Sons desativados: módulo de áudio indisponível.', erro);
   }
 }
 
@@ -54,10 +57,7 @@ const { ImpactFeedbackStyle: Impacto, NotificationFeedbackType: Notificacao } = 
 /** Retorno de som e vibração para cada tipo de interação. */
 export const feedback = {
   toque: () => vibrar(() => Haptics.selectionAsync()),
-  selecao: () => {
-    tocar('toque');
-    vibrar(() => Haptics.selectionAsync());
-  },
+  selecao: () => vibrar(() => Haptics.selectionAsync()),
   virar: () => {
     tocar('virar');
     vibrar(() => Haptics.impactAsync(Impacto.Light));
@@ -68,19 +68,13 @@ export const feedback = {
   },
   erro: () => {
     tocar('erro');
-    vibrar(() => Haptics.notificationAsync(Notificacao.Error));
+    vibrar(() => Haptics.notificationAsync(Notificacao.Warning));
   },
   conclusao: () => {
     tocar('conclusao');
     vibrar(() => Haptics.notificationAsync(Notificacao.Success));
   },
-  sucesso: () => {
-    tocar('sucesso');
-    vibrar(() => Haptics.impactAsync(Impacto.Light));
-  },
+  sucesso: () => vibrar(() => Haptics.impactAsync(Impacto.Light)),
   alerta: () => vibrar(() => Haptics.notificationAsync(Notificacao.Warning)),
-  excluir: () => {
-    tocar('excluir');
-    vibrar(() => Haptics.impactAsync(Impacto.Medium));
-  },
+  excluir: () => vibrar(() => Haptics.impactAsync(Impacto.Medium)),
 };
