@@ -1,15 +1,17 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, HelperText, Text, TextInput } from 'react-native-paper';
 import { mensagemDeErro } from '@/api/client';
 import { autenticacao } from '@/api/hooks';
+import { BotaoPrincipal } from '@/components/BotaoPrincipal';
+import { CurvaSerrote } from '@/components/CurvaSerrote';
 import { Entrada } from '@/components/Entrada';
 import { Lingo } from '@/components/Lingo';
+import { Logo } from '@/components/Logo';
 import { feedback } from '@/lib/feedback';
 import { useAuth } from '@/store/auth';
-import { cores, degrades } from '@/theme';
+import { cores, fontes, rotulo } from '@/theme';
 
 export default function Login() {
   const entrar = useAuth((s) => s.entrar);
@@ -35,53 +37,55 @@ export default function Login() {
 
   return (
     <KeyboardAvoidingView style={styles.tela} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <LinearGradient colors={degrades.brilhoFundo} style={styles.brilho} />
-      <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
-        <Entrada style={styles.marca}>
-          {/* O Lingo fica triste quando o login falha. */}
-          <Lingo humor={erro ? 'triste' : 'feliz'} tamanho={130} />
-          <Text variant="displaySmall" style={styles.nome}>
-            Lingo Cards
-          </Text>
-          <Text style={styles.slogan}>Aprenda idiomas um cartão por vez.</Text>
+      <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
+        <Entrada>
+          <Logo tamanho={36} />
         </Entrada>
 
-        <TextInput
-          mode="outlined"
-          label="E-mail"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          autoComplete="email"
-          keyboardType="email-address"
-          left={<TextInput.Icon icon="email-outline" />}
-        />
-        <TextInput
-          mode="outlined"
-          label="Senha"
-          value={senha}
-          onChangeText={setSenha}
-          secureTextEntry={!verSenha}
-          left={<TextInput.Icon icon="lock-outline" />}
-          right={<TextInput.Icon icon={verSenha ? 'eye-off' : 'eye'} onPress={() => setVerSenha(!verSenha)} />}
-        />
-        <HelperText type="error" visible={!!erro}>
-          {erro}
-        </HelperText>
+        <Entrada indice={1} style={styles.chamada}>
+          <Text style={styles.frase}>
+            O app que sabe o que você está prestes a <Text style={{ color: cores.lima }}>esquecer.</Text>
+          </Text>
+          <View style={styles.curva}>
+            <CurvaSerrote largura={190} altura={44} cor={cores.lima} />
+            {/* O Lingo fica triste quando o login falha. */}
+            <Lingo humor={erro ? 'triste' : 'feliz'} tamanho={48} />
+          </View>
+        </Entrada>
 
-        <Button
-          mode="contained"
-          onPress={handleEntrar}
-          loading={carregando}
-          disabled={carregando || !email || !senha}
-          contentStyle={styles.botao}
-        >
-          Entrar
-        </Button>
-
-        <Link href="/cadastro" asChild>
-          <Button mode="text">Não tem conta? Cadastre-se</Button>
-        </Link>
+        <Entrada indice={2} style={{ gap: 10 }}>
+          <Text style={rotulo}>Entrar</Text>
+          <TextInput
+            mode="outlined"
+            label="E-mail"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            autoComplete="email"
+            keyboardType="email-address"
+            outlineStyle={styles.campo}
+            left={<TextInput.Icon icon="email-outline" />}
+          />
+          <TextInput
+            mode="outlined"
+            label="Senha"
+            value={senha}
+            onChangeText={setSenha}
+            secureTextEntry={!verSenha}
+            outlineStyle={styles.campo}
+            left={<TextInput.Icon icon="lock-outline" />}
+            right={<TextInput.Icon icon={verSenha ? 'eye-off' : 'eye'} onPress={() => setVerSenha(!verSenha)} />}
+          />
+          <HelperText type="error" visible={!!erro} style={{ marginTop: -6 }}>
+            {erro}
+          </HelperText>
+          <BotaoPrincipal rotulo="Entrar" carregando={carregando} desativado={!email || !senha} aoPressionar={handleEntrar} />
+          <Link href="/cadastro" asChild>
+            <Button mode="text" textColor={cores.texto2} style={{ marginTop: 4 }}>
+              Não tem conta? <Text style={{ color: cores.lima, fontFamily: fontes.negrito }}>Cadastre-se</Text>
+            </Button>
+          </Link>
+        </Entrada>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -89,10 +93,9 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cores.fundo },
-  conteudo: { flexGrow: 1, justifyContent: 'center', padding: 24, gap: 8 },
-  marca: { alignItems: 'center', marginBottom: 28, gap: 6 },
-  brilho: { position: 'absolute', top: 0, left: 0, right: 0, height: 460, pointerEvents: 'none' },
-  nome: { color: cores.texto, fontWeight: '800', letterSpacing: -1 },
-  slogan: { color: cores.textoSuave, fontSize: 16 },
-  botao: { paddingVertical: 6 },
+  conteudo: { flexGrow: 1, justifyContent: 'center', padding: 24, gap: 28 },
+  chamada: { gap: 14 },
+  frase: { fontFamily: fontes.titulo, fontSize: 32, lineHeight: 36, color: cores.texto, letterSpacing: -1.2 },
+  curva: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
+  campo: { borderRadius: 16 },
 });

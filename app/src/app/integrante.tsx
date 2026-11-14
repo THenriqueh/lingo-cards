@@ -1,7 +1,7 @@
 import { Linking, StyleSheet, View } from 'react-native';
 import { Avatar, Button, Card, Chip, Text } from 'react-native-paper';
 import { Tela } from '@/components/Tela';
-import { cores } from '@/theme';
+import { cores, fontes } from '@/theme';
 
 const foto = require('@/assets/images/thallis.jpg');
 
@@ -19,10 +19,10 @@ export default function Integrante() {
     <Tela>
       <View style={styles.topo}>
         <Avatar.Image size={128} source={foto} style={styles.foto} />
-        <Text variant="headlineSmall" style={{ fontWeight: '800', textAlign: 'center' }}>
+        <Text variant="headlineSmall" style={{ fontFamily: fontes.titulo, textAlign: 'center' }}>
           Thallis Henrique Ferreira
         </Text>
-        <Text style={{ color: cores.secundaria, fontWeight: '600' }}>RA 00000830265</Text>
+        <Text style={{ color: cores.secundaria, fontFamily: fontes.semi }}>RA 00000830265</Text>
         <Text style={styles.texto}>Desenvolvedor backend (Java, Spring Boot e Kafka) e estudante de Sistemas para Internet na UNICAP.</Text>
         <View style={styles.chips}>
           <Chip icon="account-hard-hat">Desenvolvedor full stack do projeto</Chip>
@@ -30,7 +30,7 @@ export default function Integrante() {
       </View>
 
       <Card mode="contained">
-        <Card.Title title="O que eu implementei" titleStyle={{ fontWeight: '700' }} />
+        <Card.Title title="O que eu implementei" titleStyle={{ fontFamily: fontes.negrito }} />
         <Card.Content style={{ gap: 8 }}>
           {CONTRIBUICOES.map((c) => (
             <Text key={c} style={{ color: cores.texto, lineHeight: 20 }}>

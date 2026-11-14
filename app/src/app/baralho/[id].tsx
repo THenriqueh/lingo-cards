@@ -6,14 +6,16 @@ import { mensagemDeErro } from '@/api/client';
 import { useBaralho, useExcluirBaralho, useExcluirCartao } from '@/api/hooks';
 import type { Cartao } from '@/api/tipos';
 import { useAviso } from '@/components/Aviso';
+import { BotaoPrincipal } from '@/components/BotaoPrincipal';
 import { Confirmacao } from '@/components/Confirmacao';
 import { Entrada } from '@/components/Entrada';
 import { Carregando, Erro, Vazio } from '@/components/Estados';
+import { Lingo } from '@/components/Lingo';
 import { Tela } from '@/components/Tela';
 import { pendentes, plural, quandoRevisar } from '@/lib/formato';
 import { pronunciar } from '@/lib/pronuncia';
 import { usePreferencias, type ModoResposta } from '@/store/preferencias';
-import { brilho, cartaoProfundo, cores } from '@/theme';
+import { brilho, cartaoProfundo, cores, fontes, rotulo } from '@/theme';
 
 export default function DetalheBaralho() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -92,7 +94,7 @@ export default function DetalheBaralho() {
             {b.titulo}
           </Text>
           <View style={styles.tags}>
-            <Chip icon={() => <Text>{b.idioma?.bandeira}</Text>} compact>
+            <Chip icon={() => <Text style={{ fontFamily: fontes.monoForte, color: cores.lima, fontSize: 11 }}>{b.idioma?.codigo.toUpperCase()}</Text>} compact>
               {b.idioma?.nome}
             </Chip>
             <Chip compact>Nível {b.nivel}</Chip>
@@ -111,18 +113,16 @@ export default function DetalheBaralho() {
           <View style={{ gap: 10 }}>
             {/* Repetição espaçada: primeiro o que está para vencer. */}
             {paraRevisar > 0 ? (
-              <Button mode="contained" icon="calendar-refresh" contentStyle={{ paddingVertical: 8 }} style={brilho(cores.primaria)} onPress={() => estudar('revisao')}>
-                Revisar {plural(paraRevisar, 'cartão', 'cartões')} de hoje
-              </Button>
+              <BotaoPrincipal rotulo={`Revisar ${plural(paraRevisar, 'cartão', 'cartões')} de hoje`} aoPressionar={() => estudar('revisao')} />
             ) : (
-              <Card mode="contained" style={[cartaoProfundo, { backgroundColor: `${cores.acerto}18` }]}>
+              <Card mode="contained" style={[cartaoProfundo, { backgroundColor: cores.superficie2 }]}>
                 <Card.Content style={styles.emDia}>
-                  <Text style={{ fontSize: 22 }}>✅</Text>
+                  <Lingo humor="feliz" tamanho={30} />
                   <Text style={{ color: cores.texto, flex: 1 }}>Revisões em dia! Os cartões voltam quando estiverem perto de ser esquecidos.</Text>
                 </Card.Content>
               </Card>
             )}
-            <Button mode={paraRevisar > 0 ? 'outlined' : 'contained'} icon="cards-playing-outline" contentStyle={{ paddingVertical: 6 }} onPress={() => estudar('todos')}>
+            <Button mode="outlined" icon="cards-playing-outline" contentStyle={{ paddingVertical: 6 }} style={{ borderRadius: 18 }} onPress={() => estudar('todos')}>
               Estudar todos os cartões
             </Button>
             <SegmentedButtons
@@ -151,10 +151,10 @@ export default function DetalheBaralho() {
             <Card mode="contained" style={cartaoProfundo}>
               <Card.Content style={styles.cartao}>
                 <View style={{ flex: 1, gap: 2 }}>
-                  <Text variant="titleMedium" style={{ fontWeight: '700' }}>
+                  <Text variant="titleMedium" style={{ fontFamily: fontes.negrito }}>
                     {c.frente}
                   </Text>
-                  <Text style={{ color: cores.secundaria }}>{c.verso}</Text>
+                  <Text style={{ color: cores.lima }}>{c.verso}</Text>
                   {c.exemplo ? <Text style={styles.exemplo}>“{c.exemplo}”</Text> : null}
                   <Text style={styles.revisao}>{quandoRevisar(c.proximaRevisao)}</Text>
                 </View>
@@ -168,7 +168,7 @@ export default function DetalheBaralho() {
         )}
       </Tela>
 
-      <FAB icon="plus" style={styles.fab} onPress={() => router.push({ pathname: '/cartao/editar', params: { baralhoId: b.id } })} />
+      <FAB icon="plus" color={cores.sobreCor} style={styles.fab} onPress={() => router.push({ pathname: '/cartao/editar', params: { baralhoId: b.id } })} />
 
       <Confirmacao
         visivel={confirmarBaralho}
@@ -191,13 +191,13 @@ export default function DetalheBaralho() {
 }
 
 const styles = StyleSheet.create({
-  titulo: { color: cores.texto, fontWeight: '800' },
+  titulo: { color: cores.texto, fontFamily: fontes.titulo },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   descricao: { color: cores.textoSuave, fontSize: 15 },
-  secao: { color: cores.texto, fontWeight: '700', marginTop: 6 },
+  secao: { color: cores.texto, fontFamily: fontes.negrito, marginTop: 6 },
   cartao: { flexDirection: 'row', alignItems: 'center', paddingRight: 0 },
   exemplo: { color: cores.textoSuave, fontStyle: 'italic', fontSize: 13, marginTop: 2 },
-  revisao: { color: cores.textoSuave, fontSize: 11, marginTop: 4, textTransform: 'uppercase', letterSpacing: 0.5 },
+  revisao: { ...rotulo, fontSize: 10, marginTop: 4 },
   emDia: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  fab: { position: 'absolute', right: 16, bottom: 40, ...brilho(cores.primaria) },
+  fab: { position: 'absolute', right: 16, bottom: 40, ...brilho(cores.lima), backgroundColor: cores.lima, borderRadius: 18 },
 });

@@ -9,7 +9,7 @@ import { useAviso } from '@/components/Aviso';
 import { Confirmacao } from '@/components/Confirmacao';
 import { Carregando, Erro } from '@/components/Estados';
 import { formatarData, formatarDuracao, percentual } from '@/lib/formato';
-import { cores } from '@/theme';
+import { cores, fontes } from '@/theme';
 
 export default function DetalheSessao() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -24,7 +24,7 @@ function Contador({ rotulo, valor, cor, aoMudar }: { rotulo: string; valor: numb
     <Card mode="contained" style={{ flex: 1 }}>
       <Card.Content style={{ alignItems: 'center' }}>
         <Text style={{ color: cores.textoSuave }}>{rotulo}</Text>
-        <Text variant="displaySmall" style={{ color: cor, fontWeight: '800' }}>
+        <Text variant="displaySmall" style={{ color: cor, fontFamily: fontes.titulo }}>
           {valor}
         </Text>
         <View style={{ flexDirection: 'row' }}>
@@ -71,7 +71,7 @@ function Formulario({ sessao }: { sessao: Sessao }) {
 
   return (
     <ScrollView contentContainerStyle={styles.conteudo}>
-      <Text variant="headlineSmall" style={{ fontWeight: '800' }}>
+      <Text variant="headlineSmall" style={{ fontFamily: fontes.titulo }}>
         {sessao.baralho?.titulo}
       </Text>
       <Text style={{ color: cores.textoSuave }}>

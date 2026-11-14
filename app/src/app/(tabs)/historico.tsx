@@ -8,7 +8,7 @@ import { Tela } from '@/components/Tela';
 import { Titulo } from '@/components/Titulo';
 import { Toque } from '@/components/Toque';
 import { formatarData, formatarDuracao, percentual } from '@/lib/formato';
-import { cartaoProfundo, cores } from '@/theme';
+import { cartaoProfundo, cores, fontes } from '@/theme';
 
 function corDoDesempenho(p: number) {
   return p >= 80 ? cores.acerto : p >= 50 ? cores.destaque : cores.erro;
@@ -39,7 +39,7 @@ export default function Historico() {
                   <Text style={[styles.percentual, { color: corDoDesempenho(p) }]}>{p}%</Text>
                 </View>
                 <View style={{ flex: 1, gap: 2 }}>
-                  <Text variant="titleMedium" style={{ fontWeight: '700' }}>
+                  <Text variant="titleMedium" style={{ fontFamily: fontes.negrito }}>
                     {s.baralho?.titulo ?? 'Baralho'}
                   </Text>
                   <Text style={{ color: cores.textoSuave }}>
@@ -61,5 +61,5 @@ export default function Historico() {
 const styles = StyleSheet.create({
   linha: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   circulo: { width: 58, height: 58, borderRadius: 29, borderWidth: 3, alignItems: 'center', justifyContent: 'center' },
-  percentual: { fontWeight: '800', fontSize: 15 },
+  percentual: { fontFamily: fontes.titulo, fontSize: 15 },
 });

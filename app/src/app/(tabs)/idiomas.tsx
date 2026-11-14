@@ -9,10 +9,11 @@ import { useAviso } from '@/components/Aviso';
 import { Confirmacao } from '@/components/Confirmacao';
 import { Entrada } from '@/components/Entrada';
 import { Carregando, Erro, Vazio } from '@/components/Estados';
+import { CodigoIdioma } from '@/components/CodigoIdioma';
 import { Tela } from '@/components/Tela';
 import { Titulo } from '@/components/Titulo';
 import { plural } from '@/lib/formato';
-import { brilho, cartaoProfundo, cores } from '@/theme';
+import { brilho, cartaoProfundo, cores, fontes } from '@/theme';
 
 export default function Idiomas() {
   const router = useRouter();
@@ -53,13 +54,13 @@ export default function Idiomas() {
             <Entrada key={i.id} indice={indice}>
             <Card mode="contained" style={cartaoProfundo}>
               <Card.Content style={styles.linha}>
-                <Text style={styles.bandeira}>{i.bandeira}</Text>
+                <CodigoIdioma codigo={i.codigo} />
                 <View style={{ flex: 1 }}>
-                  <Text variant="titleMedium" style={{ fontWeight: '700' }}>
+                  <Text variant="titleMedium" style={{ fontFamily: fontes.negrito }}>
                     {i.nome}
                   </Text>
                   <Text style={{ color: cores.textoSuave }}>
-                    {i.codigo.toUpperCase()} · {plural(i.totalBaralhos ?? 0, 'baralho', 'baralhos')}
+                    {i.bandeira} {plural(i.totalBaralhos ?? 0, 'baralho', 'baralhos')}
                   </Text>
                 </View>
                 <IconButton
@@ -73,7 +74,7 @@ export default function Idiomas() {
           ))
         )}
       </Tela>
-      <FAB icon="plus" label="Novo" style={styles.fab} onPress={() => router.push('/idioma/editar')} />
+      <FAB icon="plus" color={cores.sobreCor} label="Novo" style={styles.fab} onPress={() => router.push('/idioma/editar')} />
       <Confirmacao
         visivel={!!aExcluir}
         titulo={`Excluir ${aExcluir?.nome}?`}
@@ -89,5 +90,5 @@ export default function Idiomas() {
 const styles = StyleSheet.create({
   linha: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingRight: 0 },
   bandeira: { fontSize: 34 },
-  fab: { position: 'absolute', right: 16, bottom: 110, ...brilho(cores.primaria) },
+  fab: { position: 'absolute', right: 16, bottom: 110, ...brilho(cores.lima), backgroundColor: cores.lima, borderRadius: 18 },
 });

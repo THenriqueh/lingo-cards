@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
-import { Button, HelperText, Text, TextInput } from 'react-native-paper';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { HelperText, Text, TextInput } from 'react-native-paper';
 import { mensagemDeErro } from '@/api/client';
 import { autenticacao } from '@/api/hooks';
+import { BotaoPrincipal } from '@/components/BotaoPrincipal';
+import { Lingo } from '@/components/Lingo';
 import { useAuth } from '@/store/auth';
 import { cores } from '@/theme';
 
@@ -32,7 +34,10 @@ export default function Cadastro() {
   return (
     <KeyboardAvoidingView style={styles.tela} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
-        <Text style={styles.texto}>Crie sua conta para montar seus baralhos e acompanhar seu progresso.</Text>
+        <View style={styles.topo}>
+          <Lingo humor="feliz" tamanho={44} />
+          <Text style={styles.texto}>Crie sua conta. O Lingo cuida de lembrar você do que revisar.</Text>
+        </View>
         <TextInput mode="outlined" label="Nome" value={nome} onChangeText={setNome} left={<TextInput.Icon icon="account-outline" />} />
         <TextInput
           mode="outlined"
@@ -55,15 +60,12 @@ export default function Cadastro() {
         <HelperText type={erro || senhaCurta ? 'error' : 'info'} visible>
           {erro ?? 'A senha precisa ter pelo menos 6 caracteres.'}
         </HelperText>
-        <Button
-          mode="contained"
-          onPress={handleCadastrar}
-          loading={carregando}
-          disabled={carregando || !nome.trim() || !email.trim() || senha.length < 6}
-          contentStyle={{ paddingVertical: 6 }}
-        >
-          Criar conta
-        </Button>
+        <BotaoPrincipal
+          rotulo="Criar conta"
+          aoPressionar={handleCadastrar}
+          carregando={carregando}
+          desativado={!nome.trim() || !email.trim() || senha.length < 6}
+        />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -72,5 +74,6 @@ export default function Cadastro() {
 const styles = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cores.fundo },
   conteudo: { padding: 24, gap: 8 },
-  texto: { color: cores.textoSuave, marginBottom: 8, fontSize: 15 },
+  texto: { flex: 1, color: cores.texto2, fontSize: 15 },
+  topo: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 12 },
 });

@@ -37,6 +37,8 @@ export type Baralho = {
   idioma?: Idioma;
   totalCartoes?: number;
   paraRevisar?: number;
+  /** Quando vence a próxima revisão do baralho (lista de baralhos). */
+  proximaRevisao?: string | null;
   cartoes?: Cartao[];
 };
 

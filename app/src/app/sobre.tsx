@@ -1,7 +1,8 @@
 import { StyleSheet, View } from 'react-native';
-import { Card, Icon, List, Text } from 'react-native-paper';
+import { Card, List, Text } from 'react-native-paper';
 import { Tela } from '@/components/Tela';
-import { cores } from '@/theme';
+import { Logo } from '@/components/Logo';
+import { cores, fontes } from '@/theme';
 
 const REQUISITOS = [
   { icone: 'routes', titulo: 'Expo Router', texto: 'Navegação por arquivos: Stack, abas nativas (Native Tabs), telas modais e rotas protegidas por login (Stack.Protected).' },
@@ -10,7 +11,7 @@ const REQUISITOS = [
   { icone: 'table-edit', titulo: 'CRUD completo das 4 entidades', texto: 'Idiomas, Baralhos, Cartões e Sessões de estudo: listar, ver, criar, editar e excluir.' },
   { icone: 'relation-one-to-many', titulo: '2 relacionamentos', texto: 'Idioma 1–N Baralho e Baralho 1–N Cartão, com exclusão em cascata.' },
   { icone: 'shield-account-outline', titulo: 'Cadastro, login e logout', texto: 'Autenticação JWT. O logout invalida o token no servidor.' },
-  { icone: 'palette-outline', titulo: 'UI Kit: React Native Paper', texto: 'Material Design 3 com tema escuro personalizado.' },
+  { icone: 'palette-outline', titulo: 'UI Kit: React Native Paper', texto: 'Material Design 3 com tema próprio: paleta lima/íris/coral, Bricolage Grotesque e JetBrains Mono.' },
   { icone: 'gesture-tap-button', titulo: 'Interação', texto: 'Botões, campos de texto, chips de seleção, menus, diálogos, contadores, puxar para atualizar e cartas que viram com animação (Reanimated).' },
 ];
 
@@ -18,7 +19,7 @@ const DIFERENCIAIS = [
   { icone: 'calendar-refresh', titulo: 'Repetição espaçada (SM-2)', texto: 'A API agenda cada cartão: o que você erra volta amanhã; o que domina, cada vez mais tarde. O app mostra o que revisar hoje.' },
   { icone: 'keyboard-outline', titulo: 'Resposta digitada com correção', texto: 'Além de virar a carta, dá para digitar a tradução. O app tolera maiúsculas e erros de digitação, e acento esquecido conta como "quase".' },
   { icone: 'volume-high', titulo: 'Pronúncia nativa', texto: 'Cada cartão pode ser ouvido com a voz do idioma (sintetizador do próprio celular, expo-speech).' },
-  { icone: 'emoticon-happy-outline', titulo: 'Mascote Lingo', texto: 'Desenho original em SVG que reage ao estudo, com sons sintetizados para o app e vibração.' },
+  { icone: 'emoticon-happy-outline', titulo: 'Identidade própria', texto: 'Marca "Curva" (a curva do esquecimento quebrada por revisões), o mascote Lingo em SVG que reage às respostas, sons sintetizados para o app e vibração.' },
 ];
 
 const BACKEND = ['Node.js + Express 5 + TypeScript', 'PostgreSQL (Neon) com Drizzle ORM', 'Autenticação JWT + bcrypt', 'Validação com Zod', 'Publicado no Render'];
@@ -27,10 +28,8 @@ export default function Sobre() {
   return (
     <Tela>
       <View style={styles.topo}>
-        <View style={styles.logo}>
-          <Icon source="cards" size={36} color={cores.fundo} />
-        </View>
-        <Text variant="headlineSmall" style={{ fontWeight: '800' }}>
+        <Logo tamanho={44} />
+        <Text variant="headlineSmall" style={{ fontFamily: fontes.titulo }}>
           Lingo Cards
         </Text>
         <Text style={styles.texto}>
@@ -47,7 +46,7 @@ export default function Sobre() {
           <List.Item
             key={r.titulo}
             title={r.titulo}
-            titleStyle={{ fontWeight: '700' }}
+            titleStyle={{ fontFamily: fontes.negrito }}
             description={r.texto}
             descriptionNumberOfLines={4}
             left={(p) => <List.Icon {...p} icon={r.icone} color={cores.primaria} />}
@@ -63,7 +62,7 @@ export default function Sobre() {
           <List.Item
             key={r.titulo}
             title={r.titulo}
-            titleStyle={{ fontWeight: '700' }}
+            titleStyle={{ fontFamily: fontes.negrito }}
             description={r.texto}
             descriptionNumberOfLines={4}
             left={(p) => <List.Icon {...p} icon={r.icone} color={cores.secundaria} />}
@@ -91,8 +90,7 @@ export default function Sobre() {
 
 const styles = StyleSheet.create({
   topo: { alignItems: 'center', gap: 8, marginBottom: 6 },
-  logo: { width: 68, height: 68, borderRadius: 22, backgroundColor: cores.primaria, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-8deg' }] },
   texto: { color: cores.textoSuave, textAlign: 'center', lineHeight: 21 },
-  secao: { fontWeight: '700', marginTop: 4 },
+  secao: { fontFamily: fontes.negrito, marginTop: 4 },
   rodape: { color: cores.textoSuave, textAlign: 'center', fontSize: 12, marginTop: 8 },
 });

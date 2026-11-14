@@ -10,7 +10,7 @@ import { formatarData } from '@/lib/formato';
 import { feedback } from '@/lib/feedback';
 import { useAuth } from '@/store/auth';
 import { usePreferencias } from '@/store/preferencias';
-import { cartaoProfundo, cores } from '@/theme';
+import { cartaoProfundo, cores, fontes } from '@/theme';
 
 export default function Conta() {
   const router = useRouter();
@@ -43,7 +43,7 @@ export default function Conta() {
         <Card.Content style={styles.perfil}>
           <Avatar.Text size={64} label={iniciais} style={{ backgroundColor: cores.primaria }} color={cores.fundo} />
           <View style={{ flex: 1 }}>
-            <Text variant="titleLarge" style={{ fontWeight: '700' }}>
+            <Text variant="titleLarge" style={{ fontFamily: fontes.negrito }}>
               {usuario?.nome}
             </Text>
             <Text style={{ color: cores.textoSuave }}>{usuario?.email}</Text>

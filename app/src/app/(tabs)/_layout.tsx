@@ -3,7 +3,7 @@ import { cores } from '@/theme';
 
 export default function TabsLayout() {
   return (
-    <NativeTabs tintColor={cores.primaria} backgroundColor={cores.superficie}>
+    <NativeTabs tintColor={cores.lima} backgroundColor={cores.superficie2}>
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Início</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="house.fill" md="home" />

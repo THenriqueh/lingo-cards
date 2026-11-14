@@ -1,66 +1,88 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Card, Icon, ProgressBar, Text } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { useBaralhos, useEstatisticas } from '@/api/hooks';
+import type { Baralho } from '@/api/tipos';
+import { BotaoPrincipal } from '@/components/BotaoPrincipal';
+import { CurvaSerrote } from '@/components/CurvaSerrote';
 import { Entrada } from '@/components/Entrada';
 import { Erro } from '@/components/Estados';
 import { Lingo, type Humor } from '@/components/Lingo';
 import { Tela } from '@/components/Tela';
 import { Toque } from '@/components/Toque';
-import { plural } from '@/lib/formato';
+import { dataCurta, emQuantosDias, plural } from '@/lib/formato';
 import { useAuth } from '@/store/auth';
-import { brilho, cartaoProfundo, cores, degrades } from '@/theme';
-
-function saudacao() {
-  const h = new Date().getHours();
-  return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
-}
+import { brilho, cores, fontes, rotulo } from '@/theme';
 
 function humorDoDesempenho(taxa: number | null | undefined): Humor {
   if (taxa == null) return 'feliz';
-  return taxa >= 80 ? 'comemorando' : taxa >= 50 ? 'feliz' : 'pensando';
+  return taxa >= 85 ? 'comemorando' : taxa >= 50 ? 'feliz' : 'pensando';
 }
 
-function Metrica({ icone, valor, rotulo, cor }: { icone: string; valor: string; rotulo: string; cor: string }) {
+function Estatistica({ valor, legenda, destaque }: { valor: string; legenda: string; destaque?: boolean }) {
   return (
-    <Card style={[styles.metrica, cartaoProfundo]} mode="contained">
-      <Card.Content style={{ gap: 4 }}>
-        <View style={[styles.metricaIcone, { backgroundColor: `${cor}22` }]}>
-          <Icon source={icone} size={20} color={cor} />
-        </View>
-        <Text variant="headlineSmall" style={styles.metricaValor}>
-          {valor}
-        </Text>
-        <Text style={styles.metricaRotulo}>{rotulo}</Text>
-      </Card.Content>
-    </Card>
+    <View style={styles.estatistica}>
+      <Text style={[styles.estatisticaValor, destaque && { color: cores.lima }]}>{valor}</Text>
+      <Text style={rotulo}>{legenda}</Text>
+    </View>
   );
 }
 
-export default function Inicio() {
+function LinhaBaralho({ baralho, aoPressionar }: { baralho: Baralho; aoPressionar: () => void }) {
+  const pendentes = baralho.paraRevisar ?? 0;
+  const total = baralho.totalCartoes ?? 0;
+  const emDia = pendentes === 0;
+  const codigo = (baralho.idioma?.codigo ?? '').toUpperCase();
+  return (
+    <Toque aoPressionar={aoPressionar}>
+      <View style={[styles.baralho, emDia && styles.baralhoEmDia]}>
+        <View style={styles.baralhoTopo}>
+          <Text style={[styles.baralhoNome, emDia && { color: cores.textoSuave }]} numberOfLines={1}>
+            <Text style={styles.codigo}>{codigo} </Text>
+            {baralho.titulo} · {baralho.nivel}
+          </Text>
+          <Text style={[styles.quando, !emDia && { color: cores.lima }]}>
+            {emDia ? emQuantosDias(baralho.proximaRevisao) || 'em dia' : `${pendentes} hoje`}
+          </Text>
+        </View>
+        {!emDia ? (
+          <View style={styles.trilho}>
+            <View style={[styles.preenchido, { width: `${Math.min(100, (pendentes / Math.max(total, 1)) * 100)}%` }]} />
+          </View>
+        ) : null}
+      </View>
+    </Toque>
+  );
+}
+
+export default function Painel() {
   const router = useRouter();
   const usuario = useAuth((s) => s.usuario);
   const estatisticas = useEstatisticas();
   const baralhos = useBaralhos();
+  const [larguraCurva, setLarguraCurva] = useState(0);
 
   const recarregar = () => Promise.all([estatisticas.refetch(), baralhos.refetch()]);
   const e = estatisticas.data;
-  // Primeiro os baralhos com revisões vencidas (repetição espaçada).
-  const recentes = (baralhos.data ?? [])
+  const primeiroNome = usuario?.nome.split(' ')[0] ?? '';
+
+  // Repetição espaçada: os baralhos com revisões vencidas vêm primeiro.
+  const lista = (baralhos.data ?? [])
     .filter((b) => (b.totalCartoes ?? 0) > 0)
     .sort((a, b) => (b.paraRevisar ?? 0) - (a.paraRevisar ?? 0))
-    .slice(0, 3);
+    .slice(0, 5);
+  const proximo = lista.find((b) => (b.paraRevisar ?? 0) > 0);
   const pendentesHoje = e?.revisoesPendentes ?? 0;
-  const primeiroNome = usuario?.nome.split(' ')[0] ?? '';
 
   return (
     <Tela semCabecalho atualizando={estatisticas.isRefetching} aoAtualizar={recarregar}>
       <Entrada style={styles.topo}>
-        <Text style={styles.saudacao}>{saudacao()},</Text>
-        <Text variant="headlineMedium" style={styles.nome}>
-          {primeiroNome} 👋
-        </Text>
+        <View style={{ flex: 1 }}>
+          <Text style={rotulo}>{dataCurta()}</Text>
+          <Text style={styles.ola}>Oi, {primeiroNome}</Text>
+        </View>
+        <Lingo humor={humorDoDesempenho(e?.taxaAcerto)} tamanho={40} />
       </Entrada>
 
       {estatisticas.isError ? (
@@ -68,125 +90,79 @@ export default function Inicio() {
       ) : (
         <>
           <Entrada indice={1}>
-            <LinearGradient colors={degrades.primaria} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.destaque}>
-              <View style={styles.destaqueTopo}>
-                <View style={{ flex: 1, gap: 6 }}>
-                  <Text style={styles.destaqueRotulo}>TAXA DE ACERTO</Text>
-                  <Text variant="displaySmall" style={styles.destaqueValor}>
-                    {e?.taxaAcerto != null ? `${e.taxaAcerto}%` : '—'}
-                  </Text>
-                </View>
-                <Lingo humor={humorDoDesempenho(e?.taxaAcerto)} tamanho={92} />
+            <View style={styles.destaque} onLayout={(ev) => setLarguraCurva(ev.nativeEvent.layout.width - 32)}>
+              <Text style={[rotulo, { color: cores.limaTinta }]}>Taxa de acerto</Text>
+              <View style={styles.destaqueLinha}>
+                <Text style={styles.destaqueValor}>{e?.taxaAcerto != null ? `${e.taxaAcerto}%` : '—'}</Text>
+                <Text style={styles.destaqueTexto}>
+                  {!e || e.totalCartoes === 0
+                    ? 'Crie seus primeiros cartões'
+                    : pendentesHoje > 0
+                      ? `${plural(pendentesHoje, 'cartão vence', 'cartões vencem')} hoje`
+                      : 'Revisões em dia'}
+                </Text>
               </View>
-              <ProgressBar progress={(e?.taxaAcerto ?? 0) / 100} color="#FFFFFF" style={styles.barra} />
-              <Text style={styles.destaqueTexto}>
-                {e && e.totalSessoes > 0
-                  ? `Em ${plural(e.totalSessoes, 'sessão', 'sessões')} · ${e.minutosEstudados} min de estudo`
-                  : 'Faça sua primeira sessão de estudo para ver seu desempenho.'}
-              </Text>
-              {e && e.totalCartoes > 0 ? (
-                <View style={styles.revisoes}>
-                  <Icon source={pendentesHoje > 0 ? 'calendar-refresh' : 'check-circle'} size={18} color="#FFFFFF" />
-                  <Text style={styles.revisoesTexto}>
-                    {pendentesHoje > 0
-                      ? `${plural(pendentesHoje, 'cartão', 'cartões')} para revisar hoje`
-                      : 'Revisões em dia!'}
-                  </Text>
-                </View>
-              ) : null}
-            </LinearGradient>
+              {larguraCurva > 0 ? <CurvaSerrote largura={larguraCurva} altura={52} /> : <View style={{ height: 52 }} />}
+            </View>
           </Entrada>
 
           <Entrada indice={2} style={styles.grade}>
-            <Metrica icone="cards-outline" valor={String(e?.totalCartoes ?? '–')} rotulo="cartões" cor={cores.primaria} />
-            <Metrica icone="calendar-check" valor={String(e?.diasEstudados ?? '–')} rotulo="dias de estudo" cor={cores.acerto} />
-            <Metrica icone="star-circle-outline" valor={String(e?.cartoesDominados ?? '–')} rotulo="dominados" cor={cores.destaque} />
+            <Estatistica valor={String(e?.totalCartoes ?? '–')} legenda="Cartões" />
+            <Estatistica valor={String(e?.cartoesDominados ?? '–')} legenda="Dominados" />
+            <Estatistica valor={String(e?.diasEstudados ?? '–')} legenda="Dias" destaque />
           </Entrada>
         </>
       )}
 
       <Entrada indice={3}>
-        <Text variant="titleMedium" style={styles.secao}>
-          Continue estudando
-        </Text>
+        <Text style={[rotulo, { marginTop: 6 }]}>Para revisar hoje</Text>
       </Entrada>
-      {recentes.length === 0 ? (
+      {lista.length === 0 ? (
         <Entrada indice={4}>
-          <Card mode="contained" style={cartaoProfundo}>
-            <Card.Content style={{ gap: 10 }}>
-              <Text style={{ color: cores.textoSuave }}>
-                Crie um idioma, depois um baralho com alguns cartões, e ele aparece aqui.
-              </Text>
-              <Button mode="contained-tonal" icon="plus" onPress={() => router.push('/idioma/editar')}>
-                Começar
-              </Button>
-            </Card.Content>
-          </Card>
+          <View style={styles.baralhoEmDia}>
+            <Text style={{ color: cores.texto2 }}>
+              Crie um idioma, depois um baralho com alguns cartões. O Lingo avisa aqui quando cada um precisa de revisão.
+            </Text>
+          </View>
         </Entrada>
       ) : (
-        recentes.map((b, indice) => (
-          <Entrada key={b.id} indice={indice + 4}>
-            <Toque aoPressionar={() => router.push({ pathname: '/baralho/[id]', params: { id: b.id } })}>
-              <Card mode="contained" style={cartaoProfundo}>
-                <Card.Title
-                  title={b.titulo}
-                  titleStyle={{ fontWeight: '700' }}
-                  subtitle={
-                    (b.paraRevisar ?? 0) > 0
-                      ? `${b.idioma?.bandeira ?? ''} ${plural(b.paraRevisar ?? 0, 'cartão', 'cartões')} para revisar`
-                      : `${b.idioma?.bandeira ?? ''} ${b.idioma?.nome ?? ''} · em dia`
-                  }
-                  right={() => {
-                    const revisar = (b.paraRevisar ?? 0) > 0;
-                    return (
-                      <Button
-                        mode={revisar ? 'contained' : 'contained-tonal'}
-                        compact
-                        icon={revisar ? 'calendar-refresh' : 'play'}
-                        style={{ marginRight: 12 }}
-                        onPress={() =>
-                          router.push({ pathname: '/estudar/[id]', params: { id: b.id, modo: revisar ? 'revisao' : 'todos' } })
-                        }
-                      >
-                        {revisar ? 'Revisar' : 'Estudar'}
-                      </Button>
-                    );
-                  }}
-                />
-              </Card>
-            </Toque>
+        lista.map((b, i) => (
+          <Entrada key={b.id} indice={i + 4}>
+            <LinhaBaralho baralho={b} aoPressionar={() => router.push({ pathname: '/baralho/[id]', params: { id: b.id } })} />
           </Entrada>
         ))
       )}
+
+      <Entrada indice={lista.length + 4} style={{ marginTop: 6 }}>
+        {proximo ? (
+          <BotaoPrincipal
+            rotulo={`Revisar ${proximo.titulo} · ${proximo.paraRevisar}`}
+            aoPressionar={() => router.push({ pathname: '/estudar/[id]', params: { id: proximo.id, modo: 'revisao' } })}
+          />
+        ) : lista.length === 0 ? (
+          <BotaoPrincipal rotulo="Começar" aoPressionar={() => router.push('/idioma/editar')} />
+        ) : null}
+      </Entrada>
     </Tela>
   );
 }
 
 const styles = StyleSheet.create({
-  topo: { marginBottom: 4 },
-  saudacao: { color: cores.textoSuave, fontSize: 16 },
-  nome: { color: cores.texto, fontWeight: '800' },
-  destaque: { borderRadius: 24, padding: 20, gap: 12, ...brilho(cores.primaria) },
-  destaqueTopo: { flexDirection: 'row', alignItems: 'center' },
-  destaqueRotulo: { color: 'rgba(255,255,255,0.8)', fontWeight: '800', letterSpacing: 1, fontSize: 12 },
-  destaqueValor: { color: '#FFFFFF', fontWeight: '800' },
-  destaqueTexto: { color: 'rgba(255,255,255,0.85)' },
-  barra: { height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.25)' },
-  revisoes: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(20,16,46,0.28)',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-  },
-  revisoesTexto: { color: '#FFFFFF', fontWeight: '700' },
-  grade: { flexDirection: 'row', gap: 10 },
-  metrica: { flex: 1 },
-  metricaIcone: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
-  metricaValor: { color: cores.texto, fontWeight: '800' },
-  metricaRotulo: { color: cores.textoSuave, fontSize: 12 },
-  secao: { color: cores.texto, fontWeight: '700', marginTop: 8 },
+  topo: { flexDirection: 'row', alignItems: 'center', marginBottom: 2 },
+  ola: { fontFamily: fontes.titulo, fontSize: 28, color: cores.texto, letterSpacing: -0.8, marginTop: 2 },
+  destaque: { backgroundColor: cores.lima, borderRadius: 22, padding: 16, gap: 8, ...brilho(cores.lima) },
+  destaqueLinha: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  destaqueValor: { fontFamily: fontes.titulo, fontSize: 46, color: cores.sobreCor, letterSpacing: -2 },
+  destaqueTexto: { flex: 1, fontFamily: fontes.semi, fontSize: 15, color: cores.sobreCor },
+  grade: { flexDirection: 'row', gap: 8 },
+  estatistica: { flex: 1, backgroundColor: cores.superficie, borderRadius: 14, borderWidth: 1, borderColor: cores.bordaSuave, padding: 12, gap: 2 },
+  estatisticaValor: { fontFamily: fontes.titulo, fontSize: 22, color: cores.texto },
+  baralho: { backgroundColor: cores.superficie, borderRadius: 16, borderWidth: 1, borderColor: cores.borda, padding: 14, gap: 10 },
+  baralhoEmDia: { backgroundColor: cores.superficie2, borderRadius: 16, borderWidth: 1, borderColor: cores.bordaSuave, padding: 14 },
+  baralhoTopo: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  baralhoNome: { flex: 1, fontFamily: fontes.negrito, fontSize: 16, color: cores.texto },
+  codigo: { fontFamily: fontes.monoForte, fontSize: 12, color: cores.texto2 },
+  quando: { fontFamily: fontes.mono, fontSize: 12, color: cores.textoSuave },
+  trilho: { height: 3, borderRadius: 2, backgroundColor: cores.bordaSuave, overflow: 'hidden' },
+  preenchido: { height: 3, backgroundColor: cores.lima },
 });

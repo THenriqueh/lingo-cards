@@ -4,13 +4,14 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { Card, Chip, FAB, Text } from 'react-native-paper';
 import { useBaralhos, useIdiomas } from '@/api/hooks';
 import { ChipSelecao } from '@/components/ChipSelecao';
+import { CodigoIdioma } from '@/components/CodigoIdioma';
 import { Entrada } from '@/components/Entrada';
 import { Carregando, Erro, Vazio } from '@/components/Estados';
 import { Tela } from '@/components/Tela';
 import { Titulo } from '@/components/Titulo';
 import { Toque } from '@/components/Toque';
 import { plural } from '@/lib/formato';
-import { brilho, cartaoProfundo, cores } from '@/theme';
+import { brilho, cartaoProfundo, cores, fontes } from '@/theme';
 
 export default function Baralhos() {
   const router = useRouter();
@@ -37,7 +38,7 @@ export default function Baralhos() {
                 selecionado={idiomaId === i.id}
                 aoPressionar={() => setIdiomaId(idiomaId === i.id ? undefined : i.id)}
               >
-                {i.bandeira} {i.nome}
+                {i.codigo.toUpperCase()} · {i.nome}
               </ChipSelecao>
             ))}
           </ScrollView>
@@ -59,9 +60,9 @@ export default function Baralhos() {
             <Toque aoPressionar={() => router.push({ pathname: '/baralho/[id]', params: { id: b.id } })}>
             <Card mode="contained" style={cartaoProfundo}>
               <Card.Content style={styles.cartao}>
-                <Text style={styles.bandeira}>{b.idioma?.bandeira}</Text>
+                <CodigoIdioma codigo={b.idioma?.codigo} />
                 <View style={{ flex: 1, gap: 2 }}>
-                  <Text variant="titleMedium" style={{ fontWeight: '700' }}>
+                  <Text variant="titleMedium" style={{ fontFamily: fontes.negrito }}>
                     {b.titulo}
                   </Text>
                   <Text style={{ color: cores.textoSuave }} numberOfLines={1}>
@@ -82,7 +83,7 @@ export default function Baralhos() {
           ))
         )}
       </Tela>
-      <FAB icon="plus" label="Novo" style={styles.fab} onPress={novo} />
+      <FAB icon="plus" color={cores.sobreCor} label="Novo" style={styles.fab} onPress={novo} />
     </View>
   );
 }
@@ -91,8 +92,8 @@ const styles = StyleSheet.create({
   filtros: { gap: 8 },
   cartao: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   bandeira: { fontSize: 32 },
-  nivel: { fontSize: 12, fontWeight: '700' },
+  nivel: { fontSize: 12, fontFamily: fontes.negrito },
   total: { color: cores.textoSuave, fontSize: 12 },
-  revisar: { color: cores.primaria, fontSize: 12, fontWeight: '700' },
-  fab: { position: 'absolute', right: 16, bottom: 110, ...brilho(cores.primaria) },
+  revisar: { color: cores.primaria, fontSize: 12, fontFamily: fontes.negrito },
+  fab: { position: 'absolute', right: 16, bottom: 110, ...brilho(cores.lima), backgroundColor: cores.lima, borderRadius: 18 },
 });
