@@ -26,7 +26,7 @@ async function garantirIdiomaDoUsuario(idiomaId: number, usuarioId: number) {
 
 const comContagens = {
   idioma: true,
-  cartoes: { columns: { id: true, proximaRevisao: true } },
+  cartoes: { columns: { id: true, proximaRevisao: true, intervaloDias: true } },
 } as const;
 
 /** Quantos cartões já estão com a revisão vencida (repetição espaçada). */
@@ -34,11 +34,13 @@ function contarParaRevisar(cartoes: { proximaRevisao: Date }[], agora = new Date
   return cartoes.filter((c) => c.proximaRevisao <= agora).length;
 }
 
-function resumir<T extends { cartoes: { id: number; proximaRevisao: Date }[] }>(b: T) {
+function resumir<T extends { cartoes: { id: number; proximaRevisao: Date; intervaloDias: number }[] }>(b: T) {
   const { cartoes, ...resto } = b;
   // Quando vence a próxima revisão do baralho (o cartão mais próximo).
   const proximaRevisao = cartoes.reduce<Date | null>((min, c) => (!min || c.proximaRevisao < min ? c.proximaRevisao : min), null);
-  return { ...resto, totalCartoes: cartoes.length, paraRevisar: contarParaRevisar(cartoes), proximaRevisao };
+  // "Dominado": intervalo de 3 semanas ou mais.
+  const dominados = cartoes.filter((c) => c.intervaloDias >= 21).length;
+  return { ...resto, totalCartoes: cartoes.length, paraRevisar: contarParaRevisar(cartoes), proximaRevisao, dominados };
 }
 
 baralhosRoutes.get('/', async (req, res) => {

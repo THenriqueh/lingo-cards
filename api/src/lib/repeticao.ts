@@ -1,6 +1,6 @@
 // Repetição espaçada baseada no algoritmo SM-2 (Piotr Woźniak, SuperMemo).
 // Cada resposta ajusta a "facilidade" do cartão e define quando ele deve voltar:
-// o que você domina aparece cada vez menos; o que você erra volta logo.
+// o que você domina aparece cada vez menos; o que você erra volta em 10 minutos.
 
 export const NOTAS = ['errei', 'dificil', 'acertei', 'facil'] as const;
 export type Nota = (typeof NOTAS)[number];
@@ -9,6 +9,7 @@ export type Nota = (typeof NOTAS)[number];
 const QUALIDADE: Record<Nota, number> = { errei: 1, dificil: 3, acertei: 4, facil: 5 };
 
 const DIA_MS = 24 * 60 * 60 * 1000;
+const REAPRENDER_MS = 10 * 60 * 1000;
 
 export type EstadoRevisao = { facilidade: number; intervaloDias: number; repeticoes: number };
 
@@ -17,9 +18,9 @@ export function calcularRevisao(atual: EstadoRevisao, nota: Nota, agora = new Da
   let { repeticoes, intervaloDias } = atual;
 
   if (q < 3) {
-    // Errou: recomeça a sequência e o cartão volta amanhã.
+    // Errou: recomeça a sequência e o cartão volta daqui a 10 minutos (reaprender).
     repeticoes = 0;
-    intervaloDias = 1;
+    intervaloDias = 0;
   } else {
     repeticoes += 1;
     if (repeticoes === 1) intervaloDias = nota === 'facil' ? 4 : 1;
@@ -33,6 +34,6 @@ export function calcularRevisao(atual: EstadoRevisao, nota: Nota, agora = new Da
     facilidade: Math.round(facilidade * 100) / 100,
     intervaloDias,
     repeticoes,
-    proximaRevisao: new Date(agora.getTime() + intervaloDias * DIA_MS),
+    proximaRevisao: new Date(agora.getTime() + (q < 3 ? REAPRENDER_MS : intervaloDias * DIA_MS)),
   };
 }

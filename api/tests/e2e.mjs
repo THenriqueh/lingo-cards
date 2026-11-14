@@ -87,10 +87,11 @@ ok(r.j.repeticoes === 2 && diasAte(r.j.proximaRevisao) === 6, 'acertou 2ª vez: 
 r = await req('POST', `/cartoes/${car2}/revisao`, { nota: 'facil' }, T);
 ok(r.j.intervaloDias > 6 && r.j.facilidade > 2.5, `fácil: intervalo cresce (${r.j.intervaloDias} dias) e facilidade sobe`);
 r = await req('POST', `/cartoes/${car2}/revisao`, { nota: 'errei' }, T);
-ok(r.j.repeticoes === 0 && diasAte(r.j.proximaRevisao) === 1 && r.j.facilidade < 2.6, 'errou: recomeça e volta amanhã');
+const minutos = Math.round((new Date(r.j.proximaRevisao).getTime() - Date.now()) / 60000);
+ok(r.j.repeticoes === 0 && minutos === 10 && r.j.facilidade < 2.6, 'errou: recomeça e volta em 10 minutos');
 ok((await req('GET', `/baralhos/${bar}`, null, T)).j.paraRevisar === 0, 'revisado sai da fila do baralho');
 r = await req('GET', '/baralhos', null, T);
-ok(diasAte(r.j[0].proximaRevisao) === 1, 'lista de baralhos informa a próxima revisão');
+ok(Math.round((new Date(r.j[0].proximaRevisao).getTime() - Date.now()) / 60000) === 10 && r.j[0].dominados === 0, 'lista de baralhos informa próxima revisão e dominados');
 r = await req('GET', '/estatisticas', null, T);
 ok(r.j.revisoesPendentes === 0 && r.j.cartoesDominados === 0, 'estatísticas trazem revisões pendentes e dominados');
 

@@ -48,7 +48,7 @@ Cada cartão guarda `facilidade`, `intervaloDias`, `repeticoes` e `proximaRevisa
 |---|---|---|
 | POST | `/cartoes/:id/revisao` | `{ "nota": "errei" \| "dificil" \| "acertei" \| "facil" }` |
 
-O servidor recalcula quando o cartão volta (`src/lib/repeticao.ts`): errou volta amanhã; acertando, o intervalo cresce (1 dia, 6 dias, depois multiplicado pela facilidade).
+O servidor recalcula quando o cartão volta (`src/lib/repeticao.ts`): errou volta em 10 minutos; acertando, o intervalo cresce (1 dia, 6 dias, depois multiplicado pela facilidade).
 `GET /cartoes?baralhoId=1&pendentes=true` lista só os cartões com revisão vencida, e cada baralho traz `paraRevisar`.
 
 Erros sempre no formato `{ "erro": "mensagem", "detalhes"?: [...] }`.
