@@ -38,7 +38,18 @@ CRUD (exigem `Authorization: Bearer <token>`), para `idiomas`, `baralhos`, `cart
 | PUT | `/<recurso>/:id` | Atualiza (parcial) |
 | DELETE | `/<recurso>/:id` | Exclui |
 
-Extra: `GET /estatisticas` traz totais, minutos estudados, dias de estudo e taxa de acerto.
+Extra: `GET /estatisticas` traz totais, minutos estudados, dias de estudo, taxa de acerto, revisões pendentes e cartões dominados.
+
+### Repetição espaçada (SM-2)
+
+Cada cartão guarda `facilidade`, `intervaloDias`, `repeticoes` e `proximaRevisao`. A cada resposta o app chama:
+
+| Método | Rota | Corpo |
+|---|---|---|
+| POST | `/cartoes/:id/revisao` | `{ "nota": "errei" \| "dificil" \| "acertei" \| "facil" }` |
+
+O servidor recalcula quando o cartão volta (`src/lib/repeticao.ts`): errou volta amanhã; acertando, o intervalo cresce (1 dia, 6 dias, depois multiplicado pela facilidade).
+`GET /cartoes?baralhoId=1&pendentes=true` lista só os cartões com revisão vencida, e cada baralho traz `paraRevisar`.
 
 Erros sempre no formato `{ "erro": "mensagem", "detalhes"?: [...] }`.
 

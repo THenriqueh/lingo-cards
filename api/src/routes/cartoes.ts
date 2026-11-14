@@ -1,9 +1,10 @@
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, eq, lte } from 'drizzle-orm';
 import { Router } from 'express';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { baralhos, cartoes } from '../db/schema.js';
 import { AppError, filtroNumerico, idDaRota, naoEncontrado, zId } from '../lib/http.js';
+import { calcularRevisao, NOTAS } from '../lib/repeticao.js';
 
 export const cartoesRoutes = Router();
 
@@ -26,13 +27,25 @@ async function tocarBaralho(baralhoId: number) {
   await db.update(baralhos).set({ atualizadoEm: new Date() }).where(eq(baralhos.id, baralhoId));
 }
 
+const revisaoSchema = z.object({
+  nota: z.enum(NOTAS, 'Nota deve ser errei, dificil, acertei ou facil.'),
+});
+
+// GET /cartoes?baralhoId=1&pendentes=true  → só os cartões com revisão vencida
 cartoesRoutes.get('/', async (req, res) => {
   const baralhoId = filtroNumerico(req, 'baralhoId');
+  const pendentes = req.query.pendentes === 'true';
   const lista = await db
     .select()
     .from(cartoes)
-    .where(and(eq(cartoes.usuarioId, req.usuarioId), baralhoId ? eq(cartoes.baralhoId, baralhoId) : undefined))
-    .orderBy(asc(cartoes.id));
+    .where(
+      and(
+        eq(cartoes.usuarioId, req.usuarioId),
+        baralhoId ? eq(cartoes.baralhoId, baralhoId) : undefined,
+        pendentes ? lte(cartoes.proximaRevisao, new Date()) : undefined,
+      ),
+    )
+    .orderBy(pendentes ? asc(cartoes.proximaRevisao) : asc(cartoes.id));
   res.json(lista);
 });
 
@@ -63,6 +76,19 @@ cartoesRoutes.put('/:id', async (req, res) => {
     .returning();
   if (!cartao) throw naoEncontrado('Cartão');
   await tocarBaralho(cartao.baralhoId);
+  res.json(cartao);
+});
+
+// Registra a resposta do usuário e agenda a próxima revisão (SM-2).
+cartoesRoutes.post('/:id/revisao', async (req, res) => {
+  const { nota } = revisaoSchema.parse(req.body);
+  const id = idDaRota(req);
+  const [atual] = await db
+    .select()
+    .from(cartoes)
+    .where(and(eq(cartoes.id, id), eq(cartoes.usuarioId, req.usuarioId)));
+  if (!atual) throw naoEncontrado('Cartão');
+  const [cartao] = await db.update(cartoes).set(calcularRevisao(atual, nota)).where(eq(cartoes.id, id)).returning();
   res.json(cartao);
 });
 

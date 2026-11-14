@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { integer, pgTable, real, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const usuarios = pgTable('usuarios', {
   id: serial('id').primaryKey(),
@@ -38,6 +38,11 @@ export const cartoes = pgTable('cartoes', {
   frente: varchar('frente', { length: 200 }).notNull(),
   verso: varchar('verso', { length: 200 }).notNull(),
   exemplo: text('exemplo'),
+  // Repetição espaçada (SM-2): quando e com que intervalo o cartão volta para revisão.
+  facilidade: real('facilidade').notNull().default(2.5),
+  intervaloDias: integer('intervalo_dias').notNull().default(0),
+  repeticoes: integer('repeticoes').notNull().default(0),
+  proximaRevisao: timestamp('proxima_revisao').notNull().defaultNow(),
   criadoEm: timestamp('criado_em').notNull().defaultNow(),
 });
 

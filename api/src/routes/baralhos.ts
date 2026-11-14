@@ -26,12 +26,17 @@ async function garantirIdiomaDoUsuario(idiomaId: number, usuarioId: number) {
 
 const comContagens = {
   idioma: true,
-  cartoes: { columns: { id: true } },
+  cartoes: { columns: { id: true, proximaRevisao: true } },
 } as const;
 
-function resumir<T extends { cartoes: { id: number }[] }>(b: T) {
+/** Quantos cartões já estão com a revisão vencida (repetição espaçada). */
+function contarParaRevisar(cartoes: { proximaRevisao: Date }[], agora = new Date()) {
+  return cartoes.filter((c) => c.proximaRevisao <= agora).length;
+}
+
+function resumir<T extends { cartoes: { id: number; proximaRevisao: Date }[] }>(b: T) {
   const { cartoes, ...resto } = b;
-  return { ...resto, totalCartoes: cartoes.length };
+  return { ...resto, totalCartoes: cartoes.length, paraRevisar: contarParaRevisar(cartoes) };
 }
 
 baralhosRoutes.get('/', async (req, res) => {
@@ -50,7 +55,7 @@ baralhosRoutes.get('/:id', async (req, res) => {
     with: { idioma: true, cartoes: true },
   });
   if (!baralho) throw naoEncontrado('Baralho');
-  res.json({ ...baralho, totalCartoes: baralho.cartoes.length });
+  res.json({ ...baralho, totalCartoes: baralho.cartoes.length, paraRevisar: contarParaRevisar(baralho.cartoes) });
 });
 
 baralhosRoutes.post('/', async (req, res) => {
