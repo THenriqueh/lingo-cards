@@ -14,6 +14,13 @@ const REQUISITOS = [
   { icone: 'gesture-tap-button', titulo: 'Interação', texto: 'Botões, campos de texto, chips de seleção, menus, diálogos, contadores, puxar para atualizar e cartas que viram com animação (Reanimated).' },
 ];
 
+const DIFERENCIAIS = [
+  { icone: 'calendar-refresh', titulo: 'Repetição espaçada (SM-2)', texto: 'A API agenda cada cartão: o que você erra volta amanhã; o que domina, cada vez mais tarde. O app mostra o que revisar hoje.' },
+  { icone: 'keyboard-outline', titulo: 'Resposta digitada com correção', texto: 'Além de virar a carta, dá para digitar a tradução. O app tolera maiúsculas e erros de digitação, e acento esquecido conta como "quase".' },
+  { icone: 'volume-high', titulo: 'Pronúncia nativa', texto: 'Cada cartão pode ser ouvido com a voz do idioma (sintetizador do próprio celular, expo-speech).' },
+  { icone: 'emoticon-happy-outline', titulo: 'Mascote Lingo', texto: 'Desenho original em SVG que reage ao estudo, com sons sintetizados para o app e vibração.' },
+];
+
 const BACKEND = ['Node.js + Express 5 + TypeScript', 'PostgreSQL (Neon) com Drizzle ORM', 'Autenticação JWT + bcrypt', 'Validação com Zod', 'Publicado no Render'];
 
 export default function Sobre() {
@@ -27,8 +34,8 @@ export default function Sobre() {
           Lingo Cards
         </Text>
         <Text style={styles.texto}>
-          Flashcards para estudar idiomas: monte baralhos por idioma e nível, estude virando as cartas e acompanhe seu
-          desempenho a cada sessão.
+          Flashcards de idiomas que sabem o que você está prestes a esquecer: o app agenda as revisões de cada cartão e
+          mostra o que estudar hoje.
         </Text>
       </View>
 
@@ -44,6 +51,22 @@ export default function Sobre() {
             description={r.texto}
             descriptionNumberOfLines={4}
             left={(p) => <List.Icon {...p} icon={r.icone} color={cores.primaria} />}
+          />
+        ))}
+      </Card>
+
+      <Text variant="titleMedium" style={styles.secao}>
+        Diferenciais
+      </Text>
+      <Card mode="contained">
+        {DIFERENCIAIS.map((r) => (
+          <List.Item
+            key={r.titulo}
+            title={r.titulo}
+            titleStyle={{ fontWeight: '700' }}
+            description={r.texto}
+            descriptionNumberOfLines={4}
+            left={(p) => <List.Icon {...p} icon={r.icone} color={cores.secundaria} />}
           />
         ))}
       </Card>
