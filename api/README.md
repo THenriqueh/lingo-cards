@@ -42,7 +42,16 @@ Extra: `GET /estatisticas` traz totais, minutos estudados, dias de estudo e taxa
 
 Erros sempre no formato `{ "erro": "mensagem", "detalhes"?: [...] }`.
 
-## Rodando localmente
+## Rodando com Docker (recomendado)
+
+Na raiz do repositório, sobe o PostgreSQL e a API juntos, sem instalar banco nem criar `.env`:
+
+```bash
+docker compose up --build      # API em http://localhost:3333
+API_URL=http://localhost:3333 npm test --prefix api
+```
+
+## Rodando sem Docker
 
 ```bash
 cp .env.example .env      # preencha DATABASE_URL e JWT_SECRET

@@ -1,0 +1,33 @@
+# Ambiente local: Postgres + API Lingo Cards
+#   docker compose up --build     → API em http://localhost:3333
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: lingo
+      POSTGRES_PASSWORD: lingo
+      POSTGRES_DB: lingo
+    ports:
+      - "5432:5432"
+    volumes:
+      - dados-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lingo -d lingo"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./api
+    environment:
+      DATABASE_URL: postgres://lingo:lingo@db:5432/lingo
+      JWT_SECRET: segredo-apenas-para-desenvolvimento-local
+      PORT: 3333
+    ports:
+      - "3333:3333"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  dados-postgres:
