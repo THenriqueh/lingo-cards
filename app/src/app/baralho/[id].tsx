@@ -7,10 +7,11 @@ import { useBaralho, useExcluirBaralho, useExcluirCartao } from '@/api/hooks';
 import type { Cartao } from '@/api/tipos';
 import { useAviso } from '@/components/Aviso';
 import { Confirmacao } from '@/components/Confirmacao';
+import { Entrada } from '@/components/Entrada';
 import { Carregando, Erro, Vazio } from '@/components/Estados';
 import { Tela } from '@/components/Tela';
 import { plural } from '@/lib/formato';
-import { cores } from '@/theme';
+import { brilho, cartaoProfundo, cores } from '@/theme';
 
 export default function DetalheBaralho() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -111,14 +112,14 @@ export default function DetalheBaralho() {
         </Text>
         {cartoes.length === 0 ? (
           <Vazio
-            icone="card-plus-outline"
             titulo="Baralho vazio"
             texto="Adicione palavras ou frases com a tradução no verso."
             acao={{ rotulo: 'Adicionar cartão', aoPressionar: () => router.push({ pathname: '/cartao/editar', params: { baralhoId: b.id } }) }}
           />
         ) : (
-          cartoes.map((c) => (
-            <Card key={c.id} mode="contained">
+          cartoes.map((c, indice) => (
+            <Entrada key={c.id} indice={indice}>
+            <Card mode="contained" style={cartaoProfundo}>
               <Card.Content style={styles.cartao}>
                 <View style={{ flex: 1, gap: 2 }}>
                   <Text variant="titleMedium" style={{ fontWeight: '700' }}>
@@ -131,6 +132,7 @@ export default function DetalheBaralho() {
                 <IconButton icon="trash-can-outline" size={20} iconColor={cores.erro} onPress={() => setCartaoAExcluir(c)} />
               </Card.Content>
             </Card>
+            </Entrada>
           ))
         )}
       </Tela>
@@ -164,5 +166,5 @@ const styles = StyleSheet.create({
   secao: { color: cores.texto, fontWeight: '700', marginTop: 6 },
   cartao: { flexDirection: 'row', alignItems: 'center', paddingRight: 0 },
   exemplo: { color: cores.textoSuave, fontStyle: 'italic', fontSize: 13, marginTop: 2 },
-  fab: { position: 'absolute', right: 16, bottom: 40 },
+  fab: { position: 'absolute', right: 16, bottom: 40, ...brilho(cores.primaria) },
 });

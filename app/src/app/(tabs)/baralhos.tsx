@@ -4,11 +4,13 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { Card, Chip, FAB, Text } from 'react-native-paper';
 import { useBaralhos, useIdiomas } from '@/api/hooks';
 import { ChipSelecao } from '@/components/ChipSelecao';
+import { Entrada } from '@/components/Entrada';
 import { Carregando, Erro, Vazio } from '@/components/Estados';
 import { Tela } from '@/components/Tela';
 import { Titulo } from '@/components/Titulo';
+import { Toque } from '@/components/Toque';
 import { plural } from '@/lib/formato';
-import { cores } from '@/theme';
+import { brilho, cartaoProfundo, cores } from '@/theme';
 
 export default function Baralhos() {
   const router = useRouter();
@@ -47,14 +49,15 @@ export default function Baralhos() {
           <Erro erro={baralhos.error} aoTentarDeNovo={baralhos.refetch} />
         ) : baralhos.data.length === 0 ? (
           <Vazio
-            icone="cards-outline"
             titulo={idiomaId ? 'Nenhum baralho neste idioma' : 'Nenhum baralho ainda'}
             texto={idiomas.data?.length ? 'Crie um baralho para começar a adicionar cartões.' : 'Primeiro, cadastre o idioma que você está estudando.'}
             acao={{ rotulo: idiomas.data?.length ? 'Novo baralho' : 'Cadastrar idioma', aoPressionar: novo }}
           />
         ) : (
-          baralhos.data.map((b) => (
-            <Card key={b.id} mode="contained" onPress={() => router.push({ pathname: '/baralho/[id]', params: { id: b.id } })}>
+          baralhos.data.map((b, indice) => (
+            <Entrada key={b.id} indice={indice}>
+            <Toque aoPressionar={() => router.push({ pathname: '/baralho/[id]', params: { id: b.id } })}>
+            <Card mode="contained" style={cartaoProfundo}>
               <Card.Content style={styles.cartao}>
                 <Text style={styles.bandeira}>{b.idioma?.bandeira}</Text>
                 <View style={{ flex: 1, gap: 2 }}>
@@ -73,6 +76,8 @@ export default function Baralhos() {
                 </View>
               </Card.Content>
             </Card>
+            </Toque>
+            </Entrada>
           ))
         )}
       </Tela>
@@ -87,5 +92,5 @@ const styles = StyleSheet.create({
   bandeira: { fontSize: 32 },
   nivel: { fontSize: 12, fontWeight: '700' },
   total: { color: cores.textoSuave, fontSize: 12 },
-  fab: { position: 'absolute', right: 16, bottom: 110 },
+  fab: { position: 'absolute', right: 16, bottom: 110, ...brilho(cores.primaria) },
 });

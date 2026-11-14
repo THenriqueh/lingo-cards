@@ -3,10 +3,12 @@ import { StyleSheet, View } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 import { useSessoes } from '@/api/hooks';
 import { Carregando, Erro, Vazio } from '@/components/Estados';
+import { Entrada } from '@/components/Entrada';
 import { Tela } from '@/components/Tela';
 import { Titulo } from '@/components/Titulo';
+import { Toque } from '@/components/Toque';
 import { formatarData, formatarDuracao, percentual } from '@/lib/formato';
-import { cores } from '@/theme';
+import { cartaoProfundo, cores } from '@/theme';
 
 function corDoDesempenho(p: number) {
   return p >= 80 ? cores.acerto : p >= 50 ? cores.destaque : cores.erro;
@@ -24,12 +26,14 @@ export default function Historico() {
       ) : sessoes.isError ? (
         <Erro erro={sessoes.error} aoTentarDeNovo={sessoes.refetch} />
       ) : sessoes.data.length === 0 ? (
-        <Vazio icone="chart-bar" titulo="Nenhuma sessão ainda" texto="Estude um baralho e o resultado aparece aqui." />
+        <Vazio titulo="Nenhuma sessão ainda" texto="Estude um baralho e o resultado aparece aqui." />
       ) : (
-        sessoes.data.map((s) => {
+        sessoes.data.map((s, indice) => {
           const p = percentual(s.acertos, s.erros);
           return (
-            <Card key={s.id} mode="contained" onPress={() => router.push({ pathname: '/sessao/[id]', params: { id: s.id } })}>
+            <Entrada key={s.id} indice={indice}>
+            <Toque aoPressionar={() => router.push({ pathname: '/sessao/[id]', params: { id: s.id } })}>
+            <Card mode="contained" style={cartaoProfundo}>
               <Card.Content style={styles.linha}>
                 <View style={[styles.circulo, { borderColor: corDoDesempenho(p) }]}>
                   <Text style={[styles.percentual, { color: corDoDesempenho(p) }]}>{p}%</Text>
@@ -45,6 +49,8 @@ export default function Historico() {
                 </View>
               </Card.Content>
             </Card>
+            </Toque>
+            </Entrada>
           );
         })
       )}

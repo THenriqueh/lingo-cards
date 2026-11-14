@@ -7,11 +7,12 @@ import { useExcluirIdioma, useIdiomas } from '@/api/hooks';
 import type { Idioma } from '@/api/tipos';
 import { useAviso } from '@/components/Aviso';
 import { Confirmacao } from '@/components/Confirmacao';
+import { Entrada } from '@/components/Entrada';
 import { Carregando, Erro, Vazio } from '@/components/Estados';
 import { Tela } from '@/components/Tela';
 import { Titulo } from '@/components/Titulo';
 import { plural } from '@/lib/formato';
-import { cores } from '@/theme';
+import { brilho, cartaoProfundo, cores } from '@/theme';
 
 export default function Idiomas() {
   const router = useRouter();
@@ -43,14 +44,14 @@ export default function Idiomas() {
           <Erro erro={idiomas.error} aoTentarDeNovo={idiomas.refetch} />
         ) : idiomas.data.length === 0 ? (
           <Vazio
-            icone="translate"
             titulo="Nenhum idioma ainda"
             texto="Cadastre o primeiro idioma que você está estudando."
             acao={{ rotulo: 'Cadastrar idioma', aoPressionar: () => router.push('/idioma/editar') }}
           />
         ) : (
-          idiomas.data.map((i) => (
-            <Card key={i.id} mode="contained">
+          idiomas.data.map((i, indice) => (
+            <Entrada key={i.id} indice={indice}>
+            <Card mode="contained" style={cartaoProfundo}>
               <Card.Content style={styles.linha}>
                 <Text style={styles.bandeira}>{i.bandeira}</Text>
                 <View style={{ flex: 1 }}>
@@ -68,6 +69,7 @@ export default function Idiomas() {
                 <IconButton icon="trash-can-outline" iconColor={cores.erro} onPress={() => setAExcluir(i)} />
               </Card.Content>
             </Card>
+            </Entrada>
           ))
         )}
       </Tela>
@@ -87,5 +89,5 @@ export default function Idiomas() {
 const styles = StyleSheet.create({
   linha: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingRight: 0 },
   bandeira: { fontSize: 34 },
-  fab: { position: 'absolute', right: 16, bottom: 110 },
+  fab: { position: 'absolute', right: 16, bottom: 110, ...brilho(cores.primaria) },
 });

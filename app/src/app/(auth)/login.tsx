@@ -1,11 +1,15 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { Button, HelperText, Icon, Text, TextInput } from 'react-native-paper';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
+import { Button, HelperText, Text, TextInput } from 'react-native-paper';
 import { mensagemDeErro } from '@/api/client';
 import { autenticacao } from '@/api/hooks';
+import { Entrada } from '@/components/Entrada';
+import { Lingo } from '@/components/Lingo';
+import { feedback } from '@/lib/feedback';
 import { useAuth } from '@/store/auth';
-import { cores } from '@/theme';
+import { cores, degrades } from '@/theme';
 
 export default function Login() {
   const entrar = useAuth((s) => s.entrar);
@@ -22,6 +26,7 @@ export default function Login() {
       const { token, usuario } = await autenticacao.login(email.trim(), senha);
       entrar(token, usuario); // o Stack.Protected leva para o app sozinho
     } catch (e) {
+      feedback.erro();
       setErro(mensagemDeErro(e));
     } finally {
       setCarregando(false);
@@ -30,16 +35,16 @@ export default function Login() {
 
   return (
     <KeyboardAvoidingView style={styles.tela} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <LinearGradient colors={degrades.brilhoFundo} style={styles.brilho} />
       <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
-        <View style={styles.marca}>
-          <View style={styles.logo}>
-            <Icon source="cards" size={44} color={cores.fundo} />
-          </View>
+        <Entrada style={styles.marca}>
+          {/* O Lingo fica triste quando o login falha. */}
+          <Lingo humor={erro ? 'triste' : 'feliz'} tamanho={130} />
           <Text variant="displaySmall" style={styles.nome}>
             Lingo Cards
           </Text>
           <Text style={styles.slogan}>Aprenda idiomas um cartão por vez.</Text>
-        </View>
+        </Entrada>
 
         <TextInput
           mode="outlined"
@@ -86,16 +91,7 @@ const styles = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cores.fundo },
   conteudo: { flexGrow: 1, justifyContent: 'center', padding: 24, gap: 8 },
   marca: { alignItems: 'center', marginBottom: 28, gap: 6 },
-  logo: {
-    width: 84,
-    height: 84,
-    borderRadius: 26,
-    backgroundColor: cores.primaria,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-    transform: [{ rotate: '-8deg' }],
-  },
+  brilho: { position: 'absolute', top: 0, left: 0, right: 0, height: 460, pointerEvents: 'none' },
   nome: { color: cores.texto, fontWeight: '800', letterSpacing: -1 },
   slogan: { color: cores.textoSuave, fontSize: 16 },
   botao: { paddingVertical: 6 },

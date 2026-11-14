@@ -1,23 +1,34 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { Button, Card, Icon, ProgressBar, Text } from 'react-native-paper';
 import { useBaralhos, useEstatisticas } from '@/api/hooks';
+import { Entrada } from '@/components/Entrada';
 import { Erro } from '@/components/Estados';
+import { Lingo, type Humor } from '@/components/Lingo';
 import { Tela } from '@/components/Tela';
+import { Toque } from '@/components/Toque';
 import { plural } from '@/lib/formato';
 import { useAuth } from '@/store/auth';
-import { cores } from '@/theme';
+import { brilho, cartaoProfundo, cores, degrades } from '@/theme';
 
 function saudacao() {
   const h = new Date().getHours();
   return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
 }
 
+function humorDoDesempenho(taxa: number | null | undefined): Humor {
+  if (taxa == null) return 'feliz';
+  return taxa >= 80 ? 'comemorando' : taxa >= 50 ? 'feliz' : 'pensando';
+}
+
 function Metrica({ icone, valor, rotulo, cor }: { icone: string; valor: string; rotulo: string; cor: string }) {
   return (
-    <Card style={styles.metrica} mode="contained">
+    <Card style={[styles.metrica, cartaoProfundo]} mode="contained">
       <Card.Content style={{ gap: 4 }}>
-        <Icon source={icone} size={22} color={cor} />
+        <View style={[styles.metricaIcone, { backgroundColor: `${cor}22` }]}>
+          <Icon source={icone} size={20} color={cor} />
+        </View>
         <Text variant="headlineSmall" style={styles.metricaValor}>
           {valor}
         </Text>
@@ -40,74 +51,87 @@ export default function Inicio() {
 
   return (
     <Tela semCabecalho atualizando={estatisticas.isRefetching} aoAtualizar={recarregar}>
-      <View style={styles.topo}>
+      <Entrada style={styles.topo}>
         <Text style={styles.saudacao}>{saudacao()},</Text>
         <Text variant="headlineMedium" style={styles.nome}>
           {primeiroNome} 👋
         </Text>
-      </View>
+      </Entrada>
 
       {estatisticas.isError ? (
         <Erro erro={estatisticas.error} aoTentarDeNovo={recarregar} />
       ) : (
         <>
-          <Card style={styles.destaque} mode="contained">
-            <Card.Content style={{ gap: 10 }}>
-              <Text style={styles.destaqueRotulo}>TAXA DE ACERTO</Text>
-              <Text variant="displaySmall" style={styles.destaqueValor}>
-                {e?.taxaAcerto != null ? `${e.taxaAcerto}%` : '—'}
-              </Text>
-              <ProgressBar progress={(e?.taxaAcerto ?? 0) / 100} color={cores.secundaria} style={styles.barra} />
+          <Entrada indice={1}>
+            <LinearGradient colors={degrades.primaria} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.destaque}>
+              <View style={styles.destaqueTopo}>
+                <View style={{ flex: 1, gap: 6 }}>
+                  <Text style={styles.destaqueRotulo}>TAXA DE ACERTO</Text>
+                  <Text variant="displaySmall" style={styles.destaqueValor}>
+                    {e?.taxaAcerto != null ? `${e.taxaAcerto}%` : '—'}
+                  </Text>
+                </View>
+                <Lingo humor={humorDoDesempenho(e?.taxaAcerto)} tamanho={92} />
+              </View>
+              <ProgressBar progress={(e?.taxaAcerto ?? 0) / 100} color="#FFFFFF" style={styles.barra} />
               <Text style={styles.destaqueTexto}>
                 {e && e.totalSessoes > 0
                   ? `Em ${plural(e.totalSessoes, 'sessão', 'sessões')} de estudo`
                   : 'Faça sua primeira sessão de estudo para ver seu desempenho.'}
               </Text>
-            </Card.Content>
-          </Card>
+            </LinearGradient>
+          </Entrada>
 
-          <View style={styles.grade}>
+          <Entrada indice={2} style={styles.grade}>
             <Metrica icone="cards-outline" valor={String(e?.totalCartoes ?? '–')} rotulo="cartões" cor={cores.primaria} />
             <Metrica icone="calendar-check" valor={String(e?.diasEstudados ?? '–')} rotulo="dias de estudo" cor={cores.acerto} />
             <Metrica icone="timer-outline" valor={String(e?.minutosEstudados ?? '–')} rotulo="minutos" cor={cores.destaque} />
-          </View>
+          </Entrada>
         </>
       )}
 
-      <Text variant="titleMedium" style={styles.secao}>
-        Continue estudando
-      </Text>
+      <Entrada indice={3}>
+        <Text variant="titleMedium" style={styles.secao}>
+          Continue estudando
+        </Text>
+      </Entrada>
       {recentes.length === 0 ? (
-        <Card mode="outlined">
-          <Card.Content style={{ gap: 10 }}>
-            <Text style={{ color: cores.textoSuave }}>
-              Crie um idioma, depois um baralho com alguns cartões, e ele aparece aqui.
-            </Text>
-            <Button mode="contained-tonal" icon="plus" onPress={() => router.push('/idioma/editar')}>
-              Começar
-            </Button>
-          </Card.Content>
-        </Card>
-      ) : (
-        recentes.map((b) => (
-          <Card key={b.id} mode="contained" onPress={() => router.push({ pathname: '/baralho/[id]', params: { id: b.id } })}>
-            <Card.Title
-              title={b.titulo}
-              titleStyle={{ fontWeight: '700' }}
-              subtitle={`${b.idioma?.bandeira ?? ''} ${b.idioma?.nome ?? ''} · ${plural(b.totalCartoes ?? 0, 'cartão', 'cartões')}`}
-              right={() => (
-                <Button
-                  mode="contained"
-                  compact
-                  icon="play"
-                  style={{ marginRight: 12 }}
-                  onPress={() => router.push({ pathname: '/estudar/[id]', params: { id: b.id } })}
-                >
-                  Estudar
-                </Button>
-              )}
-            />
+        <Entrada indice={4}>
+          <Card mode="contained" style={cartaoProfundo}>
+            <Card.Content style={{ gap: 10 }}>
+              <Text style={{ color: cores.textoSuave }}>
+                Crie um idioma, depois um baralho com alguns cartões, e ele aparece aqui.
+              </Text>
+              <Button mode="contained-tonal" icon="plus" onPress={() => router.push('/idioma/editar')}>
+                Começar
+              </Button>
+            </Card.Content>
           </Card>
+        </Entrada>
+      ) : (
+        recentes.map((b, indice) => (
+          <Entrada key={b.id} indice={indice + 4}>
+            <Toque aoPressionar={() => router.push({ pathname: '/baralho/[id]', params: { id: b.id } })}>
+              <Card mode="contained" style={cartaoProfundo}>
+                <Card.Title
+                  title={b.titulo}
+                  titleStyle={{ fontWeight: '700' }}
+                  subtitle={`${b.idioma?.bandeira ?? ''} ${b.idioma?.nome ?? ''} · ${plural(b.totalCartoes ?? 0, 'cartão', 'cartões')}`}
+                  right={() => (
+                    <Button
+                      mode="contained"
+                      compact
+                      icon="play"
+                      style={{ marginRight: 12 }}
+                      onPress={() => router.push({ pathname: '/estudar/[id]', params: { id: b.id } })}
+                    >
+                      Estudar
+                    </Button>
+                  )}
+                />
+              </Card>
+            </Toque>
+          </Entrada>
         ))
       )}
     </Tela>
@@ -118,13 +142,15 @@ const styles = StyleSheet.create({
   topo: { marginBottom: 4 },
   saudacao: { color: cores.textoSuave, fontSize: 16 },
   nome: { color: cores.texto, fontWeight: '800' },
-  destaque: { backgroundColor: cores.primaria },
-  destaqueRotulo: { color: '#1B1440', fontWeight: '800', letterSpacing: 1, fontSize: 12 },
-  destaqueValor: { color: '#14102E', fontWeight: '800' },
-  destaqueTexto: { color: '#251C57' },
-  barra: { height: 8, borderRadius: 4, backgroundColor: 'rgba(20,16,46,0.25)' },
+  destaque: { borderRadius: 24, padding: 20, gap: 12, ...brilho(cores.primaria) },
+  destaqueTopo: { flexDirection: 'row', alignItems: 'center' },
+  destaqueRotulo: { color: 'rgba(255,255,255,0.8)', fontWeight: '800', letterSpacing: 1, fontSize: 12 },
+  destaqueValor: { color: '#FFFFFF', fontWeight: '800' },
+  destaqueTexto: { color: 'rgba(255,255,255,0.85)' },
+  barra: { height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.25)' },
   grade: { flexDirection: 'row', gap: 10 },
   metrica: { flex: 1 },
+  metricaIcone: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
   metricaValor: { color: cores.texto, fontWeight: '800' },
   metricaRotulo: { color: cores.textoSuave, fontSize: 12 },
   secao: { color: cores.texto, fontWeight: '700', marginTop: 8 },

@@ -1,7 +1,9 @@
 import { StyleSheet, View } from 'react-native';
-import { ActivityIndicator, Button, Icon, Text } from 'react-native-paper';
+import { ActivityIndicator, Button, Text } from 'react-native-paper';
 import { mensagemDeErro } from '@/api/client';
 import { cores } from '@/theme';
+import { Entrada } from './Entrada';
+import { Lingo, type Humor } from './Lingo';
 
 export function Carregando() {
   return (
@@ -13,23 +15,23 @@ export function Carregando() {
 
 export function Erro({ erro, aoTentarDeNovo }: { erro: unknown; aoTentarDeNovo: () => void }) {
   return (
-    <View style={styles.centro}>
-      <Icon source="cloud-alert" size={44} color={cores.erro} />
+    <Entrada style={styles.centro}>
+      <Lingo humor="triste" tamanho={110} />
       <Text variant="titleMedium">Não foi possível carregar</Text>
       <Text style={styles.texto}>{mensagemDeErro(erro)}</Text>
       <Button mode="contained-tonal" onPress={aoTentarDeNovo}>
         Tentar de novo
       </Button>
-    </View>
+    </Entrada>
   );
 }
 
-type VazioProps = { icone: string; titulo: string; texto: string; acao?: { rotulo: string; aoPressionar: () => void } };
+type VazioProps = { humor?: Humor; titulo: string; texto: string; acao?: { rotulo: string; aoPressionar: () => void } };
 
-export function Vazio({ icone, titulo, texto, acao }: VazioProps) {
+export function Vazio({ humor = 'pensando', titulo, texto, acao }: VazioProps) {
   return (
-    <View style={styles.centro}>
-      <Icon source={icone} size={52} color={cores.primaria} />
+    <Entrada style={styles.centro}>
+      <Lingo humor={humor} tamanho={120} />
       <Text variant="titleMedium">{titulo}</Text>
       <Text style={styles.texto}>{texto}</Text>
       {acao ? (
@@ -37,7 +39,7 @@ export function Vazio({ icone, titulo, texto, acao }: VazioProps) {
           {acao.rotulo}
         </Button>
       ) : null}
-    </View>
+    </Entrada>
   );
 }
 
