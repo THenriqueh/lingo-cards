@@ -24,8 +24,10 @@ export function calcularRevisao(atual: EstadoRevisao, nota: Nota, agora = new Da
   } else {
     repeticoes += 1;
     if (repeticoes === 1) intervaloDias = nota === 'facil' ? 4 : 1;
-    else if (repeticoes === 2) intervaloDias = nota === 'facil' ? 8 : 6;
-    else intervaloDias = Math.round(intervaloDias * atual.facilidade);
+    else if (repeticoes === 2) intervaloDias = nota === 'facil' ? 8 : nota === 'dificil' ? 3 : 6;
+    // "Difícil" cresce devagar (×1,2); "acertei" cresce pela facilidade; "fácil" ganha um bônus.
+    else if (nota === 'dificil') intervaloDias = Math.max(intervaloDias + 1, Math.round(intervaloDias * 1.2));
+    else intervaloDias = Math.round(intervaloDias * atual.facilidade * (nota === 'facil' ? 1.3 : 1));
   }
 
   const facilidade = Math.max(1.3, atual.facilidade + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)));
