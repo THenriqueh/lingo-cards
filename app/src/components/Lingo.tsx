@@ -21,10 +21,10 @@ const INCLINACAO: Record<Visual, number> = { acertei: -6, comemorando: 8, quase:
 
 const ROSTO = cores.sobreCor;
 
-type Props = { humor?: Humor; tamanho?: number };
+type Props = { humor?: Humor; tamanho?: number; /** Cartão escuro com rosto lima (para usar sobre fundo lima). */ invertido?: boolean };
 
 /** Lingo, o mascote: um cartão de estudo que reage às respostas. */
-export function Lingo({ humor = 'feliz', tamanho = 64 }: Props) {
+export function Lingo({ humor = 'feliz', tamanho = 64, invertido }: Props) {
   const visual = VISUAL[humor];
   const [piscando, setPiscando] = useState(false);
   const inclinacao = useSharedValue(INCLINACAO[visual]);
@@ -59,14 +59,14 @@ export function Lingo({ humor = 'feliz', tamanho = 64 }: Props) {
   return (
     <Animated.View style={[{ width: tamanho, height: altura }, estilo]}>
       <Svg width={tamanho} height={altura} viewBox="0 0 64 76">
-        <Rect x="6" y="4" width="52" height="68" rx="10" fill={COR[visual]} />
-        <Rosto visual={visual} piscando={piscando} />
+        <Rect x="6" y="4" width="52" height="68" rx="10" fill={invertido ? cores.sobreCor : COR[visual]} />
+        <Rosto visual={visual} piscando={piscando} cor={invertido ? COR[visual] : ROSTO} />
       </Svg>
     </Animated.View>
   );
 }
 
-function Rosto({ visual, piscando }: { visual: Visual; piscando: boolean }) {
+function Rosto({ visual, piscando, cor: ROSTO }: { visual: Visual; piscando: boolean; cor: string }) {
   const olho = (cx: number, cy: number) =>
     piscando ? (
       <Path d={`M${cx - 4} ${cy} L${cx + 4} ${cy}`} stroke={ROSTO} strokeWidth={3.5} strokeLinecap="round" />

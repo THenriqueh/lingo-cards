@@ -39,6 +39,8 @@ export type Baralho = {
   paraRevisar?: number;
   /** Quando vence a próxima revisão do baralho (lista de baralhos). */
   proximaRevisao?: string | null;
+  /** Cartões com intervalo de 3 semanas ou mais (lista de baralhos). */
+  dominados?: number;
   cartoes?: Cartao[];
 };
 

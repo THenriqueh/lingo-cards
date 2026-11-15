@@ -8,16 +8,10 @@ import type { Idioma } from '@/api/tipos';
 import { ChipSelecao } from '@/components/ChipSelecao';
 import { useAviso } from '@/components/Aviso';
 import { Carregando } from '@/components/Estados';
+import { SUGESTOES_IDIOMA } from '@/lib/bandeiras';
 import { cores } from '@/theme';
 
-const SUGESTOES = [
-  { nome: 'Alemão', codigo: 'de', bandeira: '🇩🇪' },
-  { nome: 'Inglês', codigo: 'en', bandeira: '🇺🇸' },
-  { nome: 'Espanhol', codigo: 'es', bandeira: '🇪🇸' },
-  { nome: 'Francês', codigo: 'fr', bandeira: '🇫🇷' },
-  { nome: 'Italiano', codigo: 'it', bandeira: '🇮🇹' },
-  { nome: 'Japonês', codigo: 'ja', bandeira: '🇯🇵' },
-];
+const SUGESTOES = SUGESTOES_IDIOMA;
 
 export default function EditarIdioma() {
   const { id } = useLocalSearchParams<{ id?: string }>();

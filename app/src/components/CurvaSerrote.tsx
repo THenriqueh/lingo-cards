@@ -5,7 +5,7 @@ import { cores } from '@/theme';
  * A curva do esquecimento "em serrote": a memória cai com o tempo e cada revisão a levanta de novo.
  * A cada revisão a queda fica mais lenta — é a ideia do app desenhada.
  */
-export function CurvaSerrote({ largura = 240, altura = 56, cor = cores.sobreCor }: { largura?: number; altura?: number; cor?: string }) {
+export function CurvaSerrote({ largura = 240, altura = 56, cor = cores.sobreCor, espessura = 2 }: { largura?: number; altura?: number; cor?: string; espessura?: number }) {
   const trechos = [0.16, 0.2, 0.26, 0.38];
   const quedas = [0.75, 0.45, 0.3, 0.2];
   let x = 2;
@@ -21,7 +21,7 @@ export function CurvaSerrote({ largura = 240, altura = 56, cor = cores.sobreCor 
   const fim = d.split(' ').slice(-2).map(Number);
   return (
     <Svg width={largura} height={altura}>
-      <Path d={d} stroke={cor} strokeWidth={2} fill="none" strokeLinejoin="round" strokeLinecap="round" />
+      <Path d={d} stroke={cor} strokeWidth={espessura} fill="none" strokeLinejoin="round" strokeLinecap="round" />
       <Circle cx={fim[0]} cy={fim[1]} r={3.5} fill={cor} />
     </Svg>
   );

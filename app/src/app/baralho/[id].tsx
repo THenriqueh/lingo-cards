@@ -13,6 +13,7 @@ import { Carregando, Erro, Vazio } from '@/components/Estados';
 import { Lingo } from '@/components/Lingo';
 import { Tela } from '@/components/Tela';
 import { pendentes, plural, quandoRevisar } from '@/lib/formato';
+import { bandeiraDe } from '@/lib/bandeiras';
 import { pronunciar } from '@/lib/pronuncia';
 import { usePreferencias, type ModoResposta } from '@/store/preferencias';
 import { brilho, cartaoProfundo, cores, fontes, rotulo } from '@/theme';
@@ -94,7 +95,7 @@ export default function DetalheBaralho() {
             {b.titulo}
           </Text>
           <View style={styles.tags}>
-            <Chip icon={() => <Text style={{ fontFamily: fontes.monoForte, color: cores.lima, fontSize: 11 }}>{b.idioma?.codigo.toUpperCase()}</Text>} compact>
+            <Chip icon={() => <Text>{bandeiraDe(b.idioma)}</Text>} compact>
               {b.idioma?.nome}
             </Chip>
             <Chip compact>Nível {b.nivel}</Chip>

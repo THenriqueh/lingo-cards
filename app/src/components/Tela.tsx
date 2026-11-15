@@ -9,9 +9,11 @@ type Props = {
   semCabecalho?: boolean;
   atualizando?: boolean;
   aoAtualizar?: () => void;
+  /** Espaço vertical entre os blocos (padrão 14). */
+  gap?: number;
 };
 
-export function Tela({ children, semCabecalho, atualizando = false, aoAtualizar }: Props) {
+export function Tela({ children, semCabecalho, atualizando = false, aoAtualizar, gap = 14 }: Props) {
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.tela}>
@@ -19,6 +21,7 @@ export function Tela({ children, semCabecalho, atualizando = false, aoAtualizar 
         style={styles.rolagem}
         contentContainerStyle={[
           styles.conteudo,
+          { gap },
           { paddingTop: semCabecalho ? insets.top + 12 : 16, paddingBottom: insets.bottom + 110 },
         ]}
         keyboardShouldPersistTaps="handled"
@@ -36,5 +39,5 @@ export function Tela({ children, semCabecalho, atualizando = false, aoAtualizar 
 const styles = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cores.fundo },
   rolagem: { flex: 1 },
-  conteudo: { paddingHorizontal: 16, gap: 14 },
+  conteudo: { paddingHorizontal: 18 },
 });

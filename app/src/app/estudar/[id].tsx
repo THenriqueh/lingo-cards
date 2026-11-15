@@ -25,6 +25,7 @@ import { BotaoPrincipal } from '@/components/BotaoPrincipal';
 import { Entrada } from '@/components/Entrada';
 import { Carregando, Erro, Vazio } from '@/components/Estados';
 import { Lingo, type Humor } from '@/components/Lingo';
+import { bandeiraDe } from '@/lib/bandeiras';
 import { feedback } from '@/lib/feedback';
 import { intervaloCurto, pendentes, percentual, vistoHa } from '@/lib/formato';
 import { pronunciar } from '@/lib/pronuncia';
@@ -60,7 +61,7 @@ const NOTA_DA_AVALIACAO: Record<Avaliacao, NotaRevisao> = { certa: 'acertei', qu
 /** O que o Lingo diz depois de cada resposta. */
 function falaDaResposta(nota: NotaRevisao, dias: number | null) {
   if (dias == null) return nota === 'errei' ? 'Tranquilo, errar faz parte.' : 'Boa!';
-  if (nota === 'errei') return 'Anotado. Ela volta amanhã.';
+  if (nota === 'errei') return 'Tranquilo — ela volta em 10 minutos.';
   if (nota === 'dificil') return `Quase! Ela volta ${dias <= 1 ? 'amanhã' : `em ${dias} dias`}.`;
   return dias <= 1 ? 'Boa! Ela volta amanhã para fixar.' : `Boa! Ela volta só daqui a ${dias} dias.`;
 }
@@ -143,7 +144,7 @@ function Sessao({ baralho, cartoes }: { baralho: Baralho; cartoes: Cartao[] }) {
 
   const cartao = ordem[indice];
   const agenda = rodada === 0 && devidos.has(cartao.id);
-  const codigo = (baralho.idioma?.codigo ?? '').toUpperCase();
+  const bandeira = bandeiraDe(baralho.idioma);
 
   function virar(paraVerso = !virado) {
     if (paraVerso === virado) return;
@@ -233,8 +234,7 @@ function Sessao({ baralho, cartoes }: { baralho: Baralho; cartoes: Cartao[] }) {
       <View style={styles.cabecalho}>
         <IconButton icon="close" size={22} iconColor={cores.textoSuave} onPress={() => router.back()} accessibilityLabel="Sair do estudo" />
         <Text style={rotulo} numberOfLines={1}>
-          <Text style={{ fontFamily: fontes.monoForte, color: cores.texto2 }}>{codigo} </Text>
-          {baralho.idioma?.nome} · {baralho.nivel}
+          {bandeira} {baralho.idioma?.nome} · {baralho.nivel}
         </Text>
         <Text style={[rotulo, styles.contador]}>
           {String(indice + 1).padStart(2, '0')}/{String(ordem.length).padStart(2, '0')}
@@ -432,7 +432,7 @@ function Resultado({ placar, agendados, duracao, erro, aoRecomecar, aoConcluir }
   const proxima =
     menor == null
       ? 'sessão livre · a agenda não mudou'
-      : `próxima revisão: ${menor <= 1 ? 'amanhã' : `em ${menor} dias`} · ${naMesmaData} ${naMesmaData === 1 ? 'cartão' : 'cartões'}`;
+      : `próxima revisão: ${menor === 0 ? 'em 10 min' : menor === 1 ? 'amanhã' : `em ${menor} dias`} · ${naMesmaData} ${naMesmaData === 1 ? 'cartão' : 'cartões'}`;
 
   const min = Math.floor(duracao / 60);
   const seg = String(duracao % 60).padStart(2, '0');

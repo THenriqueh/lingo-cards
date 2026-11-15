@@ -11,22 +11,22 @@ import { Carregando, Erro } from '@/components/Estados';
 import { cores, NIVEIS } from '@/theme';
 
 export default function EditarBaralho() {
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  const { id, idiomaId } = useLocalSearchParams<{ id?: string; idiomaId?: string }>();
   const idiomas = useIdiomas();
   const baralho = useBaralho(Number(id ?? 0));
 
   if (idiomas.isError) return <Erro erro={idiomas.error} aoTentarDeNovo={idiomas.refetch} />;
   if (!idiomas.data || (id && !baralho.data)) return <Carregando />;
-  return <Formulario idiomas={idiomas.data} existente={id ? baralho.data : undefined} />;
+  return <Formulario idiomas={idiomas.data} existente={id ? baralho.data : undefined} idiomaInicial={idiomaId ? Number(idiomaId) : undefined} />;
 }
 
-function Formulario({ idiomas, existente }: { idiomas: Idioma[]; existente?: Baralho }) {
+function Formulario({ idiomas, existente, idiomaInicial }: { idiomas: Idioma[]; existente?: Baralho; idiomaInicial?: number }) {
   const router = useRouter();
   const salvar = useSalvarBaralho();
   const avisar = useAviso((s) => s.mostrar);
   const [titulo, setTitulo] = useState(existente?.titulo ?? '');
   const [descricao, setDescricao] = useState(existente?.descricao ?? '');
-  const [idiomaId, setIdiomaId] = useState<number | undefined>(existente?.idiomaId ?? idiomas[0]?.id);
+  const [idiomaId, setIdiomaId] = useState<number | undefined>(existente?.idiomaId ?? idiomaInicial ?? idiomas[0]?.id);
   const [nivel, setNivel] = useState(existente?.nivel ?? 'A1');
   const [erro, setErro] = useState<string | null>(null);
 

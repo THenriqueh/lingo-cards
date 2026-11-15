@@ -1,29 +1,15 @@
-import { NativeTabs } from 'expo-router/native-tabs';
+import { Tabs } from 'expo-router/js-tabs';
+import { BarraAbas } from '@/components/BarraAbas';
 import { cores } from '@/theme';
 
 export default function TabsLayout() {
   return (
-    <NativeTabs tintColor={cores.lima} backgroundColor={cores.superficie2}>
-      <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Label>Início</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="baralhos">
-        <NativeTabs.Trigger.Label>Baralhos</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="rectangle.stack.fill" md="style" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="idiomas">
-        <NativeTabs.Trigger.Label>Idiomas</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="globe" md="translate" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="historico">
-        <NativeTabs.Trigger.Label>Histórico</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="chart.bar.fill" md="bar_chart" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="conta">
-        <NativeTabs.Trigger.Label>Conta</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="person.crop.circle.fill" md="person" />
-      </NativeTabs.Trigger>
-    </NativeTabs>
+    <Tabs tabBar={(props) => <BarraAbas {...props} />} screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: cores.fundo } }}>
+      <Tabs.Screen name="index" options={{ title: 'Início' }} />
+      <Tabs.Screen name="baralhos" options={{ title: 'Baralhos' }} />
+      <Tabs.Screen name="idiomas" options={{ title: 'Idiomas' }} />
+      <Tabs.Screen name="historico" options={{ title: 'Histórico' }} />
+      <Tabs.Screen name="conta" options={{ title: 'Conta' }} />
+    </Tabs>
   );
 }
